@@ -1,5 +1,7 @@
 package br.fsa.wintrek.cli;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import br.fsa.wintrek.kernel.Kernel;
@@ -24,104 +26,130 @@ public class CLI {
 		  
 		  int round = 0;
 		  while(true) {
+			  if(game.getTimer() > 3024000) {
+				  System.out.println("GAME OVER!");
+				  break;
+			  }
 			  System.out.print("> ");
 			  String command = sc.next();
 			  int x;
 			  int y;
+			  int energy;
 			  
 			  switch(command) {
 				  case "test":
 					  
+					  Map<String, String> map = new HashMap<String, String>();
+
 					  System.out.print("Digite o valor do x: ");
-					  x= sc.nextInt();
+					  String key = sc.next();
+					  System.out.print("Digite o valor do y: ");
+					  String value = sc.next();
+
 					  
-					  int sec = game.getSectionX(x);
-					  
-					  System.out.println(sec);
+					  map.put(key, value);
+					  map.put(key+"2", value);
+
+
 					  continue;
 				
 				  case "help":
+					  System.out.println();
 					  System.out.println("### COMMANDS ###");
-					  System.out.println("help");
-					  System.out.println("game");
-					  System.out.println("navigation");
-					  System.out.println("navigation set_course");
-					  System.out.println("test");
+					  System.out.println("help            - Show help commands.");
+					  System.out.println("game            - Show game console.");
+					  System.out.println("test            - Command to test new features.");
+					  System.out.println();
+					  System.out.println("#NAVIGATION COMMANDS");
+					  System.out.println("warp            - Do a warp movement.");
+					  System.out.println("impulse         - Do an impulse movement.");
+					  System.out.println();
+					  System.out.println("#SHIELD COMMANDS");
+					  System.out.println("increase_shield - Transfer energy to shields.");
+					  System.out.println("decrease_shield - Remove energy from shields.");
+					  System.out.println();
+					  System.out.println("#WEAPOM COMMANDS");
+					  System.out.println("phaser          - Attack enemy with phaser.");
+					  System.out.println();
 					  continue;
 					  
 				  case "game":
 					  printGameScreen();
 					  continue;
 				  
-				  case "navigation":
-					  System.out.println();
-					  System.out.println("#AVAILABLE ACTIONS");
-					  System.out.println("warp");
-					  System.out.println("impulse");
-					  System.out.println("set_course");
-					  System.out.println();
-
-					  System.out.print("Digite a sua ação:");
+				  case "warp":
+				  	  System.out.print("Digite a coordenada x para warp: ");
 					  
-					  command = sc.next();
-
-					  switch(command) {
+					  x = sc.nextInt();
 					  
-					  case "warp":
-						  
-					  	  System.out.print("Digite a coordenada x para warp: ");
-						  
-						  x = sc.nextInt();
-						  
-						  System.out.print("Digite a coordenada y para warp: ");
-						  
-						  y = sc.nextInt();
-						  
-						  boolean warp = game.warpSimple(x, y);
-						  
-						  if(!warp) {
-							  System.out.println("Valores inválidos!");
-							  printGameScreen();
-							  continue;
-						  }
-						  
-						  System.out.println(game.getPlayerX());
-						  System.out.println(game.getPlayerY());
-
+					  System.out.print("Digite a coordenada y para warp: ");
+					  
+					  y = sc.nextInt();
+					  
+					  boolean warp = game.warpSimple(x, y);
+					  
+					  if(!warp) {
+						  System.out.println("Valores inválidos!");
 						  printGameScreen();
 						  continue;
-						  
-					  case "impulse":
-						  
-						  System.out.print("Digite a coordenada x para impulso: ");
-						  
-						  x = sc.nextInt();
-						  
-						  System.out.print("Digite a coordenada y para impulso: ");
-						  
-						  y = sc.nextInt();
-						  
-						  boolean impulse = game.impulseSimple(x, y);
-						  
-						  if(!impulse) {
-							  System.out.println("Valores inválidos!");
-							  printGameScreen();
-							  continue;
-						  }
-
-						  printGameScreen();
-						  continue;
-						  
-					  case "set_course":
-						  System.out.print("Digite o angulo que vc ira navegar: ");
-						  int angle = sc.nextInt();
-						  game.setCourse(angle);
-						  printGameScreen();
-						  continue;
-						  
 					  }
+
+					  printGameScreen();
+					  continue;
+				  
+				  case "impulse":
+					  
+					  System.out.print("Digite a coordenada x para impulso: ");
+					  
+					  x = sc.nextInt();
+					  
+					  System.out.print("Digite a coordenada y para impulso: ");
+					  
+					  y = sc.nextInt();
+					  
+					  boolean impulse = game.impulseSimple(x, y);
+					  
+					  if(!impulse) {
+						  System.out.println("Valores inválidos!");
+						  printGameScreen();
+						  continue;
+					  }
+
+					  printGameScreen();
+					  continue;
+
+				  case "increase_shield":
+					  System.out.print("Digite a quantidade de energia usada: ");
+					  energy = sc.nextInt();
+					  game.increaseShield(energy);
+					  printGameScreen();
 					  continue;
 					  
+				  case "decrease_shield":
+					  System.out.print("Digite a quantidade de energia usada: ");
+					  energy = sc.nextInt();
+					  game.decreaseShield(energy);
+					  printGameScreen();
+					  continue;
+				  
+				  case "phaser":
+					  System.out.print("Digite a posição x: ");
+					  x = sc.nextInt();
+					  
+					  System.out.print("Digite a posição y: ");
+					  y = sc.nextInt();
+					  
+					  System.out.print("Digite a energia: ");
+					  energy = sc.nextInt();
+					  
+					  boolean phaser = game.phaserAttackSimple(x,y,energy);
+					  
+					  if(!phaser) {
+						  System.out.println("Tiro de phaser errado!");
+					  }
+					  
+					  printGameScreen();
+					  continue;
 				  default:
 					  System.out.println("Comando não existe");
 					  continue;
@@ -188,26 +216,16 @@ public class CLI {
 		System.out.println("|__________________|_______________________|_____________________________________________________|");
 		System.out.println("|                  |                       |                                                     |");
 		System.out.println("|                  |      0 1 2 3 4 5 6 7  |        0     1     2     3     4     5     6     7  |");
-		System.out.println("|                  |      _______________  |       _____________________________________________ |");
+		System.out.println("|  Quadrant:  "+game.getQuadrantX(game.getPlayerX()) + "-"+game.getQuadrantY(game.getPlayerY()) +"  |      _______________  |       _____________________________________________ |");
 		
 		//LINHA
 		for(int i = firstX; i <= lastX; i++) {
 			
 			//STATUS
-			if(i-firstX == 0) {
-				System.out.print(
-						(game.getTimer() > 999999 ? "|  Timer: "     : 
-						 game.getTimer() > 99999  ? "|  Timer:  "    : 
-						 game.getTimer() > 9999   ? "|  Timer:   "   :
-						 game.getTimer() > 999    ? "|  Timer:    "  :
-						 game.getTimer() > 99     ? "|  Timer:     " :
-						 game.getTimer() > 9      ? "|  Timer:      ": "|  Timer:       ") + game.getTimer() + "  |");
-			}
-			else if(i-firstX == 1)
-				System.out.print("|  Quadrant:  " + game.getQuadrantX(game.getPlayerX()) + "-" + game.getQuadrantY(game.getPlayerY()) + "  |");
-			else if(i-firstX == 2)
+			
+			if(i-firstX == 0)
 				System.out.print("|  Section:   " + game.getSectionX(game.getPlayerX()) + "-" + game.getSectionY(game.getPlayerY()) + "  |");
-			else if(i-firstX == 3) {
+			else if(i-firstX == 1) {
 				if(game.getEnergy() > 999) {
 					System.out.print("|  Energy:   " + game.getEnergy() + "  |");
 				} else if(game.getEnergy() > 99) {
@@ -217,7 +235,7 @@ public class CLI {
 				} else {
 					System.out.print("|  Energy:      " + game.getEnergy() + "  |");
 				}
-			} else if(i-firstX == 4) {
+			} else if(i-firstX == 2) {
 				if(game.getShield() > 999) {
 					System.out.print("|  Shield:   " + game.getShield() + "  |");
 				} else if(game.getShield() > 99) {
@@ -227,7 +245,8 @@ public class CLI {
 				} else {
 					System.out.print("|  Shield:      " + game.getShield() + "  |");
 				}
-			} else if(i-firstX == 5) {
+				
+			} else if(i-firstX == 3) {
 				if(game.getPhoton() > 999) {
 					System.out.print("|  Photon:   " + game.getPhoton() + "  |");
 				} else if(game.getPhoton() > 99) {
@@ -237,11 +256,11 @@ public class CLI {
 				} else {
 					System.out.print("|  Photon:      " + game.getPhoton() + "  |");
 				}
-			}else if(i-firstX == 6) {
+			}else if(i-firstX == 4) {
 				//Verificar aqui, hasAlien é só para celula, precisa para quadrant
-				System.out.print("|  Condition:   " + (game.hasAlien(game.getPlayerX(), game.getPlayerY()) ? "R" : "G" ) + "  |");
+				System.out.print("|  Condition:   " + (game.checkAlienQuadrant(game.getPlayerX(), game.getPlayerY()) ? "R" : game.getEnergy() < 300 ? "Y" : (game.getEnergy() + game.getShield()) == 3000 ? "B" : "G" ) + "  |");
 			
-			}else if(i-firstX == 7) {
+			}else if(i-firstX == 5) {
 				if(game.getAliens() > 999) {
 					System.out.print("|  Aliens:   " + game.getAliens() + "  |");
 				} else if(game.getAliens() > 99) {
@@ -252,6 +271,29 @@ public class CLI {
 					System.out.print("|  Aliens:      " + game.getAliens() + "  |");
 				}
 			}
+			
+			else if(i-firstX == 6) {
+				System.out.print(
+						(game.getTimer() > 999999 ? "|  Timer: "     : 
+						 game.getTimer() > 99999  ? "|  Timer:  "    : 
+						 game.getTimer() > 9999   ? "|  Timer:   "   :
+						 game.getTimer() > 999    ? "|  Timer:    "  :
+						 game.getTimer() > 99     ? "|  Timer:     " :
+						 game.getTimer() > 9      ? "|  Timer:      ": "|  Timer:       ") + game.getTimer() + "  |");
+			}
+			
+			else if(i-firstX == 7) {
+				if(game.getPlayerLife() > 999) {
+					System.out.print("|  Life:     " + game.getPlayerLife() + "  |");
+				} else if(game.getPlayerLife() > 99) {
+					System.out.print("|  Life:      " + game.getPlayerLife() + "  |");
+				} else if(game.getPlayerLife() > 9) {
+					System.out.print("|  Life:       " + game.getPlayerLife() + "  |");
+				} else {
+					System.out.print("|  Life:        " + game.getPlayerLife() + "  |");
+				}
+			}
+			
 			else {
 				System.out.print("|                  |");
 			}
@@ -260,7 +302,7 @@ public class CLI {
 			System.out.print(" " + (i - firstX) + "   |");
   
 			for(int j = firstY; j <= lastY; j++) {
-				System.out.print((world[i][j] == 1 ? "P" : world[i][j] == 2 ? "A" : world[i][j] == 3 ? "S" : world[i][j] == 4 ? "B" : " ") + " ");
+				System.out.print((world[i][j] == 1 ? "P" : world[i][j] == 2 ? "A" : world[i][j] == 4 ? "S" : world[i][j] == 8 ? "B" : " ") + " ");
 			}
 			
 			//Index linha Long Range
@@ -289,9 +331,6 @@ public class CLI {
 		System.out.println("|                       |                                    |                                   |");
 		System.out.println("|      255     135      |                                    |                                   |");
 		System.out.println("|          100          |                                    |                                   |");
-		System.out.println("|                       |                                    |                                   |");
-		System.out.println("|         Course        |                                    |                                   |");
-		System.out.println("|          "+(game.getCourse() > 99 ? game.getCourse() : game.getCourse() > 9 ? " " + game.getCourse() : " " +  game.getCourse() + " ")+"          |                                    |                                   |");
 		System.out.println("|_______________________|____________________________________|___________________________________|");
 
 		System.out.println();

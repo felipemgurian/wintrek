@@ -13,23 +13,29 @@ public class Kernel {
 	public static final int LIMITALIENSPERQUADRANT = 2;
 	public static final int LIMITSTARSPERQUADRANT  = 2;
 	public static final int LIMITBASESPERQUADRANT  = 1;
+	public static final int MAXPLAYERLIFE  = 500;
+	public static final int MAXPHOTON  = 10;
+	public static final int ALIENLIFE  = 500;
 
 	//VARIABLES
 	Random random;
 	int[][] world;
+	Alien[] aliens;
 	int playerX       = 0;
 	int playerY       = 0;
+	int playerLife    = MAXPLAYERLIFE;
 	int totalAliens   = 20;
 	int totalStars    = 20;
 	int totalBases    = 3;
 	int totalEnergy   = 3000;
 	int totalShield   = 0;
 	int totalPhoton   = 10;
-	int course        = 90;
+	int phaserPower   = 0;
 	int timer         = 0;
 	
 	public Kernel() {
 		this.world = new int[64][64];
+		this.aliens = new Alien[totalAliens];
         random = new Random();
 	}
 	
@@ -50,6 +56,36 @@ public class Kernel {
 	            	 {
 	            	     Thread.currentThread().interrupt();
 	            	 }
+	             }
+	            }
+		  }).start();
+		 
+		 new Thread(new Runnable() {
+	            @Override
+	            public void run() {
+	             while(true) {  
+	            	 
+            		 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
+	            		 totalEnergy = 3000 - totalShield;
+	            		 playerLife = MAXPLAYERLIFE;
+	            		 totalPhoton = MAXPHOTON;
+					 }
+	        		if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+	            		 totalEnergy = 3000 - totalShield;
+	            		 playerLife = MAXPLAYERLIFE;
+	            		 totalPhoton = MAXPHOTON;
+					 }
+	        		 if(playerY < 63 && hasBase(playerX, playerY+1)) { 
+	            		 totalEnergy = 3000 - totalShield;
+	            		 playerLife = MAXPLAYERLIFE;
+	            		 totalPhoton = MAXPHOTON;
+					 }
+	        		 if(playerY > 0 && hasBase(playerX, playerY-1)) { 
+	            		 totalEnergy = 3000 - totalShield;
+	            		 playerLife = MAXPLAYERLIFE;
+	            		 totalPhoton = MAXPHOTON;
+					 }
+   	 
 	             }
 	            }
 		  }).start();
@@ -84,6 +120,7 @@ public class Kernel {
 
 			if(x != playerX && y != playerY && !hasAlien(x,y) && limitAlienQuadrant(x,y)) {
 				this.world[x][y] |= ALIEN;
+				this.aliens[count] = new Alien(x, y, ALIENLIFE);
 				count++;
 				continue;
 			}
@@ -146,14 +183,7 @@ public class Kernel {
 		}
 	}
 	
-	public void setCourse(int course) {
-		if(course > 359) {
-			course = course - 360;
-		}
 
-		this.course = course;
-	}
-	
 	public boolean warpSimple(int x, int y) {
 		if(!(x == getQuadrantX(this.playerX) && y == getQuadrantY(this.playerY)) && x >= 0 && x < 8 && y >= 0 && y < 8) {
 			
@@ -177,7 +207,7 @@ public class Kernel {
 				this.world[this.playerX][this.playerY] = 0;
 				this.playerX = newX;
 				this.playerY = newY;
-				
+				this.timer = this.timer + 86400;
 				return true;
 			} else {
 				for(int i = firstX; i <= lastX; i++) {
@@ -188,6 +218,7 @@ public class Kernel {
 							this.world[this.playerX][this.playerY] = 0;
 							this.playerX = i;
 							this.playerY = j;
+							this.timer = this.timer + 86400;
 							
 							return true;
 						}
@@ -210,7 +241,8 @@ public class Kernel {
 				this.world[this.playerX][this.playerY] = 0;
 				this.playerX = realPlayerX;
 				this.playerY = realPlayerY;
-				
+				this.timer = this.timer + 86400;
+
 				return true;
 			}
 			return false;
@@ -226,6 +258,45 @@ public class Kernel {
 		//need implement,  angle é o angulo, total é o total de warp
 	}
 	
+	public boolean phaserAttackSimple(int x, int y, int damage) {
+		// para verificar a menor distancia de um alien, pegar o a diferença de falor do x e y e somar.
+		int quadrantX = (int) Math.ceil((x)/8);
+		int quadrantY = (int) Math.ceil((y)/8);
+
+		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY + 1) * 8) - 1;
+		
+		int diffX = 7 - x;
+		int diffY = 7 - y;
+		
+		int newX = lastX - diffX;
+		int newY = lastY - diffY;
+		
+		if(hasAlien(newX, newY) && this.totalEnergy > damage) {
+			for(int i = 0; i < this.aliens.length; i++) {
+				if(this.aliens[i].getX() == newX && this.aliens[i].getY() == newY) {
+					this.aliens[i].damage(damage);
+					this.totalEnergy -= damage;
+					
+					if(this.aliens[i].getLife() <= 0) {
+						this.world[newX][newY] = 0;
+						this.totalAliens--;
+						this.aliens[i].setX(-1);
+						this.aliens[i].setY(-1);
+						System.out.println("Alien destruido!");
+					}
+					
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public void phaserAttack(int x, int y, int damage) {
+		// need implement, check stars ....
+	}
+	
 	public void setOneQuadrant(int quadrantX, int quadrantY) {
 		int lastX = ((quadrantX + 1) * 8) - 1;
 		int lastY = ((quadrantY + 1) * 8) - 1;
@@ -235,6 +306,26 @@ public class Kernel {
 				this.world[i][j] = 1;
 			}
 		}
+	}
+	
+	public boolean increaseShield(int amount) {
+		if(this.totalEnergy > amount) {
+			this.totalShield += amount;
+			this.totalEnergy -= amount;
+			
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean decreaseShield(int amount) {
+		if(this.totalShield >= amount) {
+			this.totalShield -= amount;
+			this.totalEnergy += amount;
+			
+			return true;
+		}
+		return false;
 	}
 	
 	//GETS
@@ -341,9 +432,6 @@ public class Kernel {
 		return realPlayerY;
 	}
 	
-	
-	
-	
 	public int getSectionX(int x) {
 		int quadrantX = (int) Math.ceil((x)/8);
 		int lastX = ((quadrantX + 1) * 8) - 1;
@@ -385,6 +473,10 @@ public class Kernel {
 		return this.totalPhoton;
 	}
 	
+	public int getPhaserPower() {
+		return this.phaserPower;
+	}
+	
 	public int getAliens() {
 		return this.totalAliens;
 	}
@@ -393,9 +485,10 @@ public class Kernel {
 		return this.timer;
 	}
 	
-	public int getCourse() {
-		return this.course;
+	public int getPlayerLife() {
+		return this.playerLife;
 	}
+	
 	
 	//CHECKS
     public boolean hasAlien(int x, int y) {
@@ -482,6 +575,24 @@ public class Kernel {
 		}
 		
 		if(totalStars < LIMITSTARSPERQUADRANT) return true;
+    	
+    	return false;
+    }
+    
+    public boolean checkAlienQuadrant(int x, int y) {
+    	int quadrantX = (int) Math.ceil((x)/8);
+    	int quadrantY = (int) Math.ceil((y)/8);
+    	
+    	int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY+ 1) * 8) - 1;
+		
+		for(int i = lastX; i > lastX - 8; i--) {
+			for(int j = lastY; j > lastY - 8; j--) {
+				if(this.world[i][j] == (this.world[i][j] | ALIEN) ) {
+					return true;
+				}
+			}
+		}
     	
     	return false;
     }

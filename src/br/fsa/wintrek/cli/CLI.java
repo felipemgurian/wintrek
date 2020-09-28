@@ -35,21 +35,35 @@ public class CLI {
 			  int x;
 			  int y;
 			  int energy;
+			  String attacktype;
+			  int attacktypeint;
 			  
 			  switch(command) {
 				  case "test":
 					  
-					  Map<String, String> map = new HashMap<String, String>();
+					  System.out.println();
 
-					  System.out.print("Digite o valor do x: ");
-					  String key = sc.next();
-					  System.out.print("Digite o valor do y: ");
-					  String value = sc.next();
-
+					  System.out.print("Digite tipo de attack phaser 0 para wide dispersal, 1 para single: ");
+					  attacktype = sc.next();
 					  
-					  map.put(key, value);
-					  map.put(key+"2", value);
-
+					  System.out.print("Digite a quantidade de energia: ");
+					  energy = sc.nextInt();
+					  
+					  attacktypeint = 0;
+					  
+					  if(attacktype == "0" || attacktype == "1") {
+						  attacktypeint = Integer.parseInt(attacktype);
+					  }
+					  
+					  if(attacktypeint == 0) {
+						  System.out.println("Phaser attack - Wide Dispesal");
+					  } else {
+						  System.out.println("Phaser attack - Target");
+					  }
+					  
+					  game.phaserAttackSimple(attacktypeint, energy);
+					  System.out.println();
+					  printGameScreen();
 
 					  continue;
 				
@@ -70,6 +84,8 @@ public class CLI {
 					  System.out.println();
 					  System.out.println("#WEAPOM COMMANDS");
 					  System.out.println("phaser          - Attack enemy with phaser.");
+					  System.out.println("photon          - Attack enemy with photon.");
+
 					  System.out.println();
 					  continue;
 					  
@@ -78,18 +94,18 @@ public class CLI {
 					  continue;
 				  
 				  case "warp":
-				  	  System.out.print("Digite a coordenada x para warp: ");
+				  	  System.out.print("Coordinate x: ");
 					  
 					  x = sc.nextInt();
 					  
-					  System.out.print("Digite a coordenada y para warp: ");
+					  System.out.print("Coordinate y: ");
 					  
 					  y = sc.nextInt();
 					  
 					  boolean warp = game.warpSimple(x, y);
 					  
 					  if(!warp) {
-						  System.out.println("Valores inválidos!");
+						  System.out.println("invalid coordinates!");
 						  printGameScreen();
 						  continue;
 					  }
@@ -99,18 +115,18 @@ public class CLI {
 				  
 				  case "impulse":
 					  
-					  System.out.print("Digite a coordenada x para impulso: ");
+					  System.out.print("Coordinate x: ");
 					  
 					  x = sc.nextInt();
 					  
-					  System.out.print("Digite a coordenada y para impulso: ");
+					  System.out.print("Coordinate y: ");
 					  
 					  y = sc.nextInt();
 					  
 					  boolean impulse = game.impulseSimple(x, y);
 					  
 					  if(!impulse) {
-						  System.out.println("Valores inválidos!");
+						  System.out.println("invalid coordinates");
 						  printGameScreen();
 						  continue;
 					  }
@@ -119,39 +135,62 @@ public class CLI {
 					  continue;
 
 				  case "increase_shield":
-					  System.out.print("Digite a quantidade de energia usada: ");
+					  System.out.print("Energy used: ");
 					  energy = sc.nextInt();
 					  game.increaseShield(energy);
 					  printGameScreen();
 					  continue;
 					  
 				  case "decrease_shield":
-					  System.out.print("Digite a quantidade de energia usada: ");
+					  System.out.print("Energy used: ");
 					  energy = sc.nextInt();
 					  game.decreaseShield(energy);
 					  printGameScreen();
 					  continue;
 				  
 				  case "phaser":
-					  System.out.print("Digite a posição x: ");
-					  x = sc.nextInt();
+					  System.out.println();
+
+					  System.out.print("Attack Type (0 = wide dispersal/ 1 = single target):  ");
+					  attacktype = sc.next();
 					  
-					  System.out.print("Digite a posição y: ");
-					  y = sc.nextInt();
-					  
-					  System.out.print("Digite a energia: ");
+					  System.out.print("Energy used: ");
 					  energy = sc.nextInt();
 					  
-					  boolean phaser = game.phaserAttackSimple(x,y,energy);
+					  attacktypeint = 0;
 					  
-					  if(!phaser) {
-						  System.out.println("Tiro de phaser errado!");
+					  if(attacktype.equals("0") || attacktype.equals("1")) {
+						  attacktypeint = Integer.parseInt(attacktype);
 					  }
 					  
+					  if(attacktypeint == 0) {
+						  System.out.println("Phaser attack - Wide Dispesal");
+					  } else {
+						  System.out.println("Phaser attack - Target");
+					  }
+					  
+					  game.phaserAttackSimple(attacktypeint, energy);
+					  System.out.println();
+					  printGameScreen();
+
+					  continue;
+				  case "photon":
+					  System.out.println();
+				  	  System.out.print("Coordinate x: ");
+					  
+					  x = sc.nextInt();
+					  
+					  System.out.print("Coordinate y: ");
+					  
+					  y = sc.nextInt();
+					  
+					  game.photonAttackSimple(x,y);
+					  System.out.println();
 					  printGameScreen();
 					  continue;
+					  
 				  default:
-					  System.out.println("Comando não existe");
+					  System.out.println("Unexpected command");
 					  continue;
 					  
 			  }
@@ -304,7 +343,7 @@ public class CLI {
 			for(int j = firstY; j <= lastY; j++) {
 				System.out.print((world[i][j] == 1 ? "P" : world[i][j] == 2 ? "A" : world[i][j] == 4 ? "S" : world[i][j] == 8 ? "B" : " ") + " ");
 			}
-			
+			//IMPLEMENTAR VERIFICAÇÃO APENAS PARA VIZINHOS
 			//Index linha Long Range
 			System.out.print(" |  " + (i - firstX) + "   |");
 			for(int j = 0; j < 8; j++) {

@@ -70,20 +70,23 @@ public class Kernel {
 	            		 playerLife = MAXPLAYERLIFE;
 	            		 totalPhoton = MAXPHOTON;
 					 }
-	        		if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+            		 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
 	            		 totalEnergy = 3000 - totalShield;
 	            		 playerLife = MAXPLAYERLIFE;
 	            		 totalPhoton = MAXPHOTON;
+
 					 }
-	        		 if(playerY < 63 && hasBase(playerX, playerY+1)) { 
+            		 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
 	            		 totalEnergy = 3000 - totalShield;
 	            		 playerLife = MAXPLAYERLIFE;
 	            		 totalPhoton = MAXPHOTON;
+
 					 }
-	        		 if(playerY > 0 && hasBase(playerX, playerY-1)) { 
+            		 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
 	            		 totalEnergy = 3000 - totalShield;
 	            		 playerLife = MAXPLAYERLIFE;
 	            		 totalPhoton = MAXPHOTON;
+
 					 }
    	 
 	             }
@@ -258,10 +261,10 @@ public class Kernel {
 		//need implement,  angle é o angulo, total é o total de warp
 	}
 	
-	public boolean phaserAttackSimple(int x, int y, int damage) {
+	public boolean photonAttackSimple(int x, int y) {
 		// para verificar a menor distancia de um alien, pegar o a diferença de falor do x e y e somar.
-		int quadrantX = (int) Math.ceil((x)/8);
-		int quadrantY = (int) Math.ceil((y)/8);
+		int quadrantX = (int) Math.ceil((this.playerX)/8);
+		int quadrantY = (int) Math.ceil((this.playerY)/8);
 
 		int lastX = ((quadrantX + 1) * 8) - 1;
 		int lastY = ((quadrantY + 1) * 8) - 1;
@@ -271,25 +274,120 @@ public class Kernel {
 		
 		int newX = lastX - diffX;
 		int newY = lastY - diffY;
-		
-		if(hasAlien(newX, newY) && this.totalEnergy > damage) {
+
+		if(hasAlien(newX, newY)) {
 			for(int i = 0; i < this.aliens.length; i++) {
 				if(this.aliens[i].getX() == newX && this.aliens[i].getY() == newY) {
-					this.aliens[i].damage(damage);
-					this.totalEnergy -= damage;
+					this.aliens[i].damage(this.aliens[i].getLife());
+					this.totalPhoton--;
 					
 					if(this.aliens[i].getLife() <= 0) {
 						this.world[newX][newY] = 0;
 						this.totalAliens--;
 						this.aliens[i].setX(-1);
 						this.aliens[i].setY(-1);
-						System.out.println("Alien destruido!");
+						System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
 					}
 					
 					return true;
 				}
 			}
 		}
+		return false;
+	}
+	
+	public boolean phaserAttackSimple(int attackType, int damage) {
+		//attacktype if 0 = wide dispersal, if 1 = single dispersalhelp		
+		if(getEnergy() < damage) {
+			System.out.println("Not enougth energy to this action!");
+			return false;
+		}
+		
+		int quadrantX = (int) Math.ceil((this.playerX)/8);
+		int quadrantY = (int) Math.ceil((this.playerY)/8);
+				
+		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY + 1) * 8) - 1;
+		
+		int firstX = lastX - 7;
+		int firstY = lastY - 7;
+		
+		int[]  aliensIndexes = new int[LIMITALIENSPERQUADRANT];
+		
+		int aliensInArray = 0;
+		
+		for(int i = firstX; i <= lastX; i++) {
+			for(int j = firstY; j <= lastY; j++) {
+				boolean hasAlien = hasAlien(i, j);
+				
+				for(int k = 0; k < this.aliens.length; k++) {
+					if(this.aliens[k].getX() == i && this.aliens[k].getY() == j) {
+						aliensIndexes[aliensInArray] = k;
+						aliensInArray++;
+					}
+				}
+			}
+		}
+		
+		if(attackType == 0) {
+			for(int i = 0; i < aliensInArray; i++) {
+				int index = aliensIndexes[i];
+
+				int x = this.aliens[index].getX();
+				int y = this.aliens[index].getY();
+				
+				this.aliens[index].damage(damage/aliensInArray);
+				this.totalEnergy -= (damage/aliensInArray);
+				System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage/aliensInArray));
+				System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[index].getLife());
+
+				if(this.aliens[index].getLife() <= 0) {
+					System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+					this.world[x][y] = 0;
+					this.totalAliens--;
+					this.aliens[index].setX(-1);
+					this.aliens[index].setY(-1);
+				}
+			}
+			return true;
+
+		} else {
+			
+			int closestAlienIndex = aliensIndexes[0];
+			
+			for(int i = 1; i < aliensInArray; i++) {
+				int index = aliensIndexes[i];
+				
+				int x = this.aliens[index].getX();
+				int y = this.aliens[index].getY();
+				
+				int closX = this.aliens[closestAlienIndex].getX();
+				int closY = this.aliens[closestAlienIndex].getY();
+
+				if(x+y < closX + closY) {
+					closestAlienIndex = index;
+				}
+			}
+			
+			int x = this.aliens[closestAlienIndex].getX();
+			int y = this.aliens[closestAlienIndex].getY();
+
+			this.aliens[closestAlienIndex].damage(damage);
+			this.totalEnergy -= (damage/aliensInArray);
+			System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage));
+			System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[closestAlienIndex].getLife());
+
+			if(this.aliens[closestAlienIndex].getLife() <= 0) {
+				System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+				this.world[x][y] = 0;
+				this.totalAliens--;
+				this.aliens[closestAlienIndex].setX(-1);
+				this.aliens[closestAlienIndex].setY(-1);
+			}
+			
+			
+		}
+		
 		return false;
 	}
 	

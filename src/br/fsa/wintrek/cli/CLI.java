@@ -1,9 +1,11 @@
 package br.fsa.wintrek.cli;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import br.fsa.wintrek.kernel.Coordinates;
 import br.fsa.wintrek.kernel.Kernel;
 
 public class CLI {
@@ -49,11 +51,19 @@ public class CLI {
 					  System.out.print("Digite o angulo: ");
 					  int angle = sc.nextInt();
 
-					  int resultX = game.getXWithAngle(angle, dist);
-					  int resultY = game.getYWithAngle(angle, dist);
+					  int xf = game.getXWithAngle(angle, dist) + game.getPlayerX();
+					  int yf = game.getYWithAngle(angle, dist) + game.getPlayerY();
+					  
+					  ArrayList<Coordinates> coordinates = game.getLine(game.getPlayerX(), game.getPlayerY(), xf, yf);
 
-					  System.out.println(resultX);
-					  System.out.println(resultY);
+					  System.out.println(xf);
+					  System.out.println(yf);
+					  
+					  System.out.println();
+					  
+					  for(int i = 0; i < coordinates.size(); i++) {
+						  System.out.println("("+coordinates.get(i).getX()+","+" "+coordinates.get(i).getY() + ")");
+					  }
 
 					  continue;
 				
@@ -75,7 +85,9 @@ public class CLI {
 					  System.out.println("#WEAPOM COMMANDS");
 					  System.out.println("phaser          - Attack enemy with phaser.");
 					  System.out.println("photon          - Attack enemy with photon.");
-
+					  System.out.println();
+					  System.out.println("#COMPUTER COMMANDS");
+					  System.out.println("computer        - run computer commands.");
 					  System.out.println();
 					  continue;
 					  
@@ -159,26 +171,31 @@ public class CLI {
 						  System.out.println("Phaser attack - Target");
 					  }
 					  
-					  game.phaserAttackSimple(attacktypeint, energy);
+					  game.phaserAttack(attacktypeint, energy);
 					  System.out.println();
 					  printGameScreen();
 
 					  continue;
 				  case "photon":
 					  System.out.println();
-				  	  System.out.print("Coordinate x: ");
+				  	  System.out.print("Angle: ");
 					  
-					  x = sc.nextInt();
+				  	  angle = sc.nextInt();
 					  
-					  System.out.print("Coordinate y: ");
+					  System.out.print("Distance: ");
 					  
-					  y = sc.nextInt();
+					  dist = sc.nextInt();
 					  
-					  game.photonAttackSimple(x,y);
+					  game.photonAttack(angle, dist);
 					  System.out.println();
 					  printGameScreen();
 					  continue;
-					  
+				  
+				  case "computer":
+					  System.out.println();
+				  	  System.out.print("NOT IMPLEMENTED YET!");
+				  	  continue;
+				  	  
 				  default:
 					  System.out.println("Unexpected command");
 					  continue;
@@ -358,7 +375,7 @@ public class CLI {
 		System.out.println("|                       |                                    |                                   |");
 		System.out.println("|   180             0   |                                    |                                   |");
 		System.out.println("|                       |                                    |                                   |");
-		System.out.println("|      225     315      |                                    |                                   |");
+		System.out.println("|      225      315     |                                    |                                   |");
 		System.out.println("|          270          |                                    |                                   |");
 		System.out.println("|_______________________|____________________________________|___________________________________|");
 

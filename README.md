@@ -28,15 +28,11 @@
 
 **phaser          - Attack enemy with phaser.**
 
-(IMPLEMENTADO DE FORMA SIMPLIFICADA!)
-
-Permite que o usuário escolha entre wide dispersal ou single target, não verifica se possui estrela na frente ...
+(IMPLEMENTADO 100%)
 
 **photon          - Attack enemy with photon.**
 
-(IMPLEMENTADO DE FORMA SIMPLIFICADA!)
-
-Permite que o usuário escolha as coordenadas, não solicita angulo, não verifica se possui estrela na frente.
+(IMPLEMENTADO 100%)
 
 ### TEMPO NO JOGO
 
@@ -51,7 +47,3 @@ Caso o a nave fique 1 casa ao lado da base espacial, a vida, os canhões fotonic
 **Movimentação da nave inimiga**
 
 **Ataque da nave inimiga**
-
-**Phaser verificando estrelas**
-
-**Photon utilizando angulo**

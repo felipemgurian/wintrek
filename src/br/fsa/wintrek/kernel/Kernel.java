@@ -17,7 +17,7 @@ public class Kernel {
 	public static final int LIMITBASESPERQUADRANT  = 1;
 	public static final int MAXPLAYERLIFE  = 500;
 	public static final int MAXPHOTON  = 10;
-	public static final int ALIENLIFE  = 500;
+	public static final int ALIENLIFE  = 100;
 
 	//VARIABLES
 	Random random;
@@ -58,39 +58,6 @@ public class Kernel {
 	            	 {
 	            	     Thread.currentThread().interrupt();
 	            	 }
-	             }
-	            }
-		  }).start();
-		 
-		 new Thread(new Runnable() {
-	            @Override
-	            public void run() {
-	             while(true) {  
-	            	 
-            		 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
-	            		 totalEnergy = 3000 - totalShield;
-	            		 playerLife = MAXPLAYERLIFE;
-	            		 totalPhoton = MAXPHOTON;
-					 }
-            		 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
-	            		 totalEnergy = 3000 - totalShield;
-	            		 playerLife = MAXPLAYERLIFE;
-	            		 totalPhoton = MAXPHOTON;
-
-					 }
-            		 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
-	            		 totalEnergy = 3000 - totalShield;
-	            		 playerLife = MAXPLAYERLIFE;
-	            		 totalPhoton = MAXPHOTON;
-
-					 }
-            		 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
-	            		 totalEnergy = 3000 - totalShield;
-	            		 playerLife = MAXPLAYERLIFE;
-	            		 totalPhoton = MAXPHOTON;
-
-					 }
-   	 
 	             }
 	            }
 		  }).start();
@@ -259,8 +226,6 @@ public class Kernel {
 		int x = getXWithAngle(angle, dist) + this.playerX;
 		int y = getYWithAngle(angle, dist) + this.playerY;
 		
-		System.out.println(x);
-		System.out.println(y);
 		int quadrantX = getQuadrantX(x);
 		int quadrantY = getQuadrantY(y);
 		
@@ -276,6 +241,35 @@ public class Kernel {
 			this.playerX = x;
 			this.playerY = y;
 			this.timer += dist*86400;
+			
+			 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
 			
 			return true;
 		}
@@ -305,6 +299,34 @@ public class Kernel {
 				this.playerX = x;
 				this.playerY = y;
 				this.timer = this.timer + dist*86400;
+				
+				 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+				 }
+        		 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
+        		 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
+        		 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
 				return true;
 			}
 		}
@@ -441,12 +463,192 @@ public class Kernel {
 		return false;
 	}
 	
-	public void phaserAttack(int x, int y, int damage) {
-		// need implement, check stars ....
+	public boolean phaserAttack(int attackType, int damage) {
+		if(getEnergy() < damage) {
+			System.out.println("Not enougth energy to this action!");
+			return false;
+		}
+		
+		int quadrantX = (int) Math.ceil((this.playerX)/8);
+		int quadrantY = (int) Math.ceil((this.playerY)/8);
+				
+		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY + 1) * 8) - 1;
+		
+		int firstX = lastX - 7;
+		int firstY = lastY - 7;
+		
+		int[]  aliensIndexes = new int[LIMITALIENSPERQUADRANT];
+		
+		int aliensInArray = 0;
+		
+		for(int i = firstX; i <= lastX; i++) {
+			for(int j = firstY; j <= lastY; j++) {
+				boolean hasAlien = hasAlien(i, j);
+				
+				for(int k = 0; k < this.aliens.length; k++) {
+					if(this.aliens[k].getX() == i && this.aliens[k].getY() == j) {
+						aliensIndexes[aliensInArray] = k;
+						aliensInArray++;
+					}
+				}
+			}
+		}
+		
+		if(attackType == 0) {
+			for(int i = 0; i < aliensInArray; i++) {
+				int index = aliensIndexes[i];
+
+				int x = this.aliens[index].getX();
+				int y = this.aliens[index].getY();
+				
+				ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
+				
+				boolean hasStar = false;
+				
+				for(int j = 0; j < coordinatesToAlien.size(); j++) {
+					if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
+						hasStar = true;
+						break;
+					}
+				}
+				
+				if(hasStar) {
+					System.out.println();
+					System.out.println("A Star in the way blocks the shoot!");
+					System.out.println("Alien in pos "+x+"-"+y+" don't receive damage");
+					continue;
+				}
+				
+				this.aliens[index].damage(damage/aliensInArray);
+				this.totalEnergy -= (damage/aliensInArray);
+				System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage/aliensInArray));
+				System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[index].getLife());
+
+				if(this.aliens[index].getLife() <= 0) {
+					System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+					this.world[x][y] = 0;
+					this.totalAliens--;
+					this.aliens[index].setX(-1);
+					this.aliens[index].setY(-1);
+				}
+			}
+			return true;
+
+		} else {
+			
+			int closestAlienIndex = aliensIndexes[0];
+			
+			for(int i = 1; i < aliensInArray; i++) {
+				int index = aliensIndexes[i];
+				
+				int x = this.aliens[index].getX();
+				int y = this.aliens[index].getY();
+				
+				int closX = this.aliens[closestAlienIndex].getX();
+				int closY = this.aliens[closestAlienIndex].getY();
+
+				if(x+y < closX + closY) {
+					closestAlienIndex = index;
+				}
+			}
+			
+			int x = this.aliens[closestAlienIndex].getX();
+			int y = this.aliens[closestAlienIndex].getY();
+			
+			ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
+
+			for(int j = 0; j < coordinatesToAlien.size(); j++) {
+				if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
+					System.out.println("A Star in the way blocks the shoot!");
+					continue;
+				}
+			}
+			
+			this.aliens[closestAlienIndex].damage(damage);
+			this.totalEnergy -= (damage/aliensInArray);
+			System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage));
+			System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[closestAlienIndex].getLife());
+
+			if(this.aliens[closestAlienIndex].getLife() <= 0) {
+				System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+				this.world[x][y] = 0;
+				this.totalAliens--;
+				this.aliens[closestAlienIndex].setX(-1);
+				this.aliens[closestAlienIndex].setY(-1);
+			}
+			
+			
+		}
+		
+		return false;
 	}
 	
-	public void photonAttack(int x, int y, int damage) {
-		// need implement, check stars ....
+	public boolean photonAttack(int angle, int dist) {
+		int x = getXWithAngle(angle, dist) + this.playerX;
+		int y = getYWithAngle(angle, dist) + this.playerY;
+		
+		int quadrantPlayerX = getQuadrantX(this.playerX);
+		int quadrantPlayerY = getQuadrantY(this.playerY);
+
+		int quadrantX = getQuadrantX(x);
+		int quadrantY = getQuadrantY(y);
+		
+		if(quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY || x < 0 || x > 63 || y < 0 || y > 63) {
+			System.out.println();
+			System.out.println("You miss the shoot!");
+			this.totalPhoton--;
+			return false;
+		}
+		
+		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY + 1) * 8) - 1;
+		
+		int diffX = 7 - x;
+		int diffY = 7 - y;
+		
+
+		if(hasAlien(x, y)) {
+			
+			ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
+			
+			boolean hasStar = false;
+			
+			for(int j = 0; j < coordinatesToAlien.size(); j++) {
+				if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
+					hasStar = true;
+					break;
+				}
+			}
+			
+			if(hasStar) {
+				System.out.println();
+				System.out.println("A Star in the way blocks the shoot!");
+				System.out.println("Alien in pos "+x+"-"+y+" don't receive damage");
+				this.totalPhoton--;
+				return false;
+			}
+			
+			for(int i = 0; i < this.aliens.length; i++) {
+				if(this.aliens[i].getX() == x && this.aliens[i].getY() == y) {
+					this.aliens[i].damage(this.aliens[i].getLife());
+					this.totalPhoton--;
+					
+					if(this.aliens[i].getLife() <= 0) {
+						this.world[x][y] = 0;
+						this.totalAliens--;
+						this.aliens[i].setX(-1);
+						this.aliens[i].setY(-1);
+						System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+					}
+					
+					return true;
+				}
+			}
+		}
+		this.totalPhoton--;
+		System.out.println("You miss the shoot!");
+		return false;
 	}
 	
 	
@@ -658,7 +860,7 @@ public class Kernel {
 		return y;
 	}
 	
-	public ArrayList<Coordinates> checkWay(int xi, int yi, int xf, int yf) {
+	public ArrayList<Coordinates> getLine(int xi, int yi, int xf, int yf) {
 		
 		ArrayList<Coordinates> coordinates = new ArrayList<Coordinates>();
 		

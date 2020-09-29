@@ -43,27 +43,17 @@ public class CLI {
 					  
 					  System.out.println();
 
-					  System.out.print("Digite tipo de attack phaser 0 para wide dispersal, 1 para single: ");
-					  attacktype = sc.next();
+					  System.out.print("Digite a distancia:");
+					  int dist = sc.nextInt();
 					  
-					  System.out.print("Digite a quantidade de energia: ");
-					  energy = sc.nextInt();
-					  
-					  attacktypeint = 0;
-					  
-					  if(attacktype == "0" || attacktype == "1") {
-						  attacktypeint = Integer.parseInt(attacktype);
-					  }
-					  
-					  if(attacktypeint == 0) {
-						  System.out.println("Phaser attack - Wide Dispesal");
-					  } else {
-						  System.out.println("Phaser attack - Target");
-					  }
-					  
-					  game.phaserAttackSimple(attacktypeint, energy);
-					  System.out.println();
-					  printGameScreen();
+					  System.out.print("Digite o angulo: ");
+					  int angle = sc.nextInt();
+
+					  int resultX = game.getXWithAngle(angle, dist);
+					  int resultY = game.getYWithAngle(angle, dist);
+
+					  System.out.println(resultX);
+					  System.out.println(resultY);
 
 					  continue;
 				
@@ -94,15 +84,15 @@ public class CLI {
 					  continue;
 				  
 				  case "warp":
-				  	  System.out.print("Coordinate x: ");
+				  	  System.out.print("Angle: ");
 					  
-					  x = sc.nextInt();
+					  angle = sc.nextInt();
 					  
-					  System.out.print("Coordinate y: ");
+					  System.out.print("Distance: ");
 					  
-					  y = sc.nextInt();
+					  dist = sc.nextInt();
 					  
-					  boolean warp = game.warpSimple(x, y);
+					  boolean warp = game.warp(angle, dist);
 					  
 					  if(!warp) {
 						  System.out.println("invalid coordinates!");
@@ -115,15 +105,15 @@ public class CLI {
 				  
 				  case "impulse":
 					  
-					  System.out.print("Coordinate x: ");
+					  System.out.print("Angle: ");
 					  
-					  x = sc.nextInt();
+					  angle = sc.nextInt();
 					  
-					  System.out.print("Coordinate y: ");
+					  System.out.print("Distance: ");
 					  
-					  y = sc.nextInt();
+					  dist = sc.nextInt();
 					  
-					  boolean impulse = game.impulseSimple(x, y);
+					  boolean impulse = game.impulse(angle, dist);
 					  
 					  if(!impulse) {
 						  System.out.println("invalid coordinates");
@@ -363,13 +353,13 @@ public class CLI {
 		System.out.println("|       NAVIGATION      |                                    |                                   |");
 		System.out.println("|_______________________|____________________________________|___________________________________|");
 		System.out.println("|                       |                                    |                                   |");
-		System.out.println("|           0           |                                    |                                   |");
-		System.out.println("|      345      45      |                                    |                                   |");
+		System.out.println("|           90          |                                    |                                   |");
+		System.out.println("|      135      45      |                                    |                                   |");
 		System.out.println("|                       |                                    |                                   |");
-		System.out.println("|   270            90   |                                    |                                   |");
+		System.out.println("|   180             0   |                                    |                                   |");
 		System.out.println("|                       |                                    |                                   |");
-		System.out.println("|      255     135      |                                    |                                   |");
-		System.out.println("|          100          |                                    |                                   |");
+		System.out.println("|      225     315      |                                    |                                   |");
+		System.out.println("|          270          |                                    |                                   |");
 		System.out.println("|_______________________|____________________________________|___________________________________|");
 
 		System.out.println();

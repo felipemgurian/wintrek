@@ -1,5 +1,7 @@
 package br.fsa.wintrek.kernel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Kernel {
@@ -253,12 +255,60 @@ public class Kernel {
 		return false;
 	}
 	
-	public void impulse(int angle, int total) {
-		//need implement, angle é o angulo, total é o total de impulsos
+	public boolean impulse(int angle, int dist) {
+		int x = getXWithAngle(angle, dist) + this.playerX;
+		int y = getYWithAngle(angle, dist) + this.playerY;
+		
+		System.out.println(x);
+		System.out.println(y);
+		int quadrantX = getQuadrantX(x);
+		int quadrantY = getQuadrantY(y);
+		
+		int quadrantPlayerX = getQuadrantX(this.playerX);
+		int quadrantPlayerY = getQuadrantY(this.playerY);
+
+		
+		if(x < 0 || x > 63 || y < 0 || y > 63 || quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY) return false;
+		
+		if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
+			this.world[this.playerX][this.playerY] = 0;
+			this.world[x][y] |= PLAYER;
+			this.playerX = x;
+			this.playerY = y;
+			this.timer += dist*86400;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
-	public void warp(int angle, int total) {
-		//need implement,  angle é o angulo, total é o total de warp
+	public boolean warp(int angle, int dist) {
+		int quadrantX = getXWithAngle(angle, dist) + getQuadrantX(this.playerX);
+		int quadrantY = getYWithAngle(angle, dist) + getQuadrantY(this.playerY);
+		
+		if(quadrantX < 0 || quadrantX > 7 || quadrantY < 0 || quadrantY > 7) return false;
+
+		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastY = ((quadrantY + 1) * 8) - 1;
+		
+		int firstX = lastX - 7;
+		int firstY = lastY - 7;
+
+		while(true) {
+			int x = (int) ((Math.random() * (lastX - firstX)) + firstX);
+			int y = (int) ((Math.random() * (lastY - firstY)) + firstY);
+			
+			if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
+				this.world[x][y] |= PLAYER;
+				this.world[this.playerX][this.playerY] = 0;
+				this.playerX = x;
+				this.playerY = y;
+				this.timer = this.timer + dist*86400;
+				return true;
+			}
+		}
+		
 	}
 	
 	public boolean photonAttackSimple(int x, int y) {
@@ -394,6 +444,11 @@ public class Kernel {
 	public void phaserAttack(int x, int y, int damage) {
 		// need implement, check stars ....
 	}
+	
+	public void photonAttack(int x, int y, int damage) {
+		// need implement, check stars ....
+	}
+	
 	
 	public void setOneQuadrant(int quadrantX, int quadrantY) {
 		int lastX = ((quadrantX + 1) * 8) - 1;
@@ -587,6 +642,49 @@ public class Kernel {
 		return this.playerLife;
 	}
 	
+	public int getXWithAngle(int angle, int dist) {
+		double alpha = Math.toRadians(angle);
+		
+		int x = (int) Math.round(-Math.sin(alpha) * dist);
+				
+		return x;
+	}
+	
+	public int getYWithAngle(int angle, int dist) {
+		double alpha = Math.toRadians(angle);
+		
+		int y = (int) Math.round(Math.cos(alpha) * dist);
+				
+		return y;
+	}
+	
+	public ArrayList<Coordinates> checkWay(int xi, int yi, int xf, int yf) {
+		
+		ArrayList<Coordinates> coordinates = new ArrayList<Coordinates>();
+		
+		int dx = Math.abs(xf - xi);
+        int dy = Math.abs(yf - yi);
+        
+        int sx = xi < xf ? 1 : -1;
+        int sy = yi < yf ? 1 : -1; 
+        
+        double err = (dx>dy ? dx : -dy)/2;
+        
+        while (true) {
+        	
+        	coordinates.add(new Coordinates(xi, yi));
+        	
+        	if (xi == xf && yi == yf) break;
+        	
+        	double e2 = err;
+        	
+        	if (e2 > -dx) { err -= dy; xi += sx; }
+        	if (e2 < dy) { err += dx; yi += sy; }
+        }
+        
+        return coordinates;
+
+	}
 	
 	//CHECKS
     public boolean hasAlien(int x, int y) {

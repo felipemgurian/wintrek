@@ -10,18 +10,13 @@
 
 (IMPLEMENTADO 100%)
 
-
 **warp            - Do a warp movement.**
 
-(IMPLEMENTADO DE FORMA SIMPLIFICADA!)
-
-O usuário insere o quadrante que quer se movimentar, a cada movimentação consome 1 dia, não solicita angulo nem quantidade de warp;
+(IMPLEMENTADO 100%)
 
 **impulse         - Do an impulse movement.**
 
-(IMPLEMENTADO DE FORMA SIMPLIFICADA!)
-
-O usuário insere o setor que quer se movimentar, a cada movimentação consome 1 dia, não solicita angulo nem quantidade de impulse;
+(IMPLEMENTADO 100%)
 
 **increase_shield - Transfer energy to shields.**
 
@@ -60,5 +55,3 @@ Caso o a nave fique 1 casa ao lado da base espacial, a vida, os canhões fotonic
 **Phaser verificando estrelas**
 
 **Photon utilizando angulo**
-
-**Movimentações utilizando angulo**

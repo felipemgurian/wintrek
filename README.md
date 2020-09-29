@@ -34,6 +34,14 @@
 
 (IMPLEMENTADO 100%)
 
+### MOVIMENTAÇÃO NAVE INIMIGA
+
+(IMPLEMENTADO 100%)
+
+### ATAQUE NAVE INIMIGA
+
+(IMPLEMENTADO 100%)
+
 ### TEMPO NO JOGO
 
 A cada segundo é somado 1 segundo no tempo do jogo, caso o jogador efetue algum tipo de movimentação, warp ou impulse, será somado 1 dia no tempo em segundos.
@@ -44,6 +52,8 @@ Caso o a nave fique 1 casa ao lado da base espacial, a vida, os canhões fotonic
 
 ## NECESSÁRIO IMPLEMENTAR:
 
-**Movimentação da nave inimiga**
+**Implementar funções do computador**
 
-**Ataque da nave inimiga**
+**Melhorar lógica do long range, mostrar apenas vizinhos**
+
+**Melhorar tratamento de exceção**

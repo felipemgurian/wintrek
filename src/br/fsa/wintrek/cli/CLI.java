@@ -1,8 +1,6 @@
 package br.fsa.wintrek.cli;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 import br.fsa.wintrek.kernel.Coordinates;
@@ -17,7 +15,7 @@ public class CLI {
 	}
 	
 	public void init() {
-		 
+			  		
 		  intro();
 		  
 		  Scanner sc = new Scanner(System.in);
@@ -28,10 +26,11 @@ public class CLI {
 		  
 		  int round = 0;
 		  while(true) {
-			  if(game.getTimer() > 3024000) {
+			  if(game.getTimer() > 3024000 || game.getPlayerLife() <= 0) {
 				  System.out.println("GAME OVER!");
 				  break;
 			  }
+
 			  System.out.print("> ");
 			  String command = sc.next();
 			  int x;
@@ -355,11 +354,10 @@ public class CLI {
 			System.out.print(" |  " + (i - firstX) + "   |");
 			for(int j = 0; j < 8; j++) {
 
-				if(j < 7) {
-					System.out.print(game.getTotalAliensQuadrant(i - firstX, j) + "" + game.getTotalBasesQuadrant(i - firstX, j) + game.getTotalStarsQuadrant(i - firstX, j) + "   ");
-				} else {
-					System.out.print(game.getTotalAliensQuadrant(i - firstX, j) + "" + game.getTotalBasesQuadrant(i - firstX, j) + game.getTotalStarsQuadrant(i - firstX, j) + " ");
-				}
+
+				System.out.print(game.getTotalAliensQuadrant(i - firstX, j) + "" + game.getTotalBasesQuadrant(i - firstX, j) + game.getTotalStarsQuadrant(i - firstX, j) + ( j < 7 ? "   " : " "));
+
+			
 			}
 			System.out.print("|");
 			System.out.println();
@@ -385,7 +383,6 @@ public class CLI {
 	}
 	
 	public void printLongWorld() {
-		int[][] world = game.getWorld();
 		
 		System.out.print("      0     1     2     3     4     5     6     7");
 		System.out.println();

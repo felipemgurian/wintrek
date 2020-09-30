@@ -354,9 +354,69 @@ public class CLI {
 			System.out.print(" |  " + (i - firstX) + "   |");
 			for(int j = 0; j < 8; j++) {
 
-
-				System.out.print(game.getTotalAliensQuadrant(i - firstX, j) + "" + game.getTotalBasesQuadrant(i - firstX, j) + game.getTotalStarsQuadrant(i - firstX, j) + ( j < 7 ? "   " : " "));
-
+				if(
+					  (j == (game.getQuadrantY(game.getPlayerY()) + 1) && i - firstX == game.getQuadrantX(game.getPlayerX()) + 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()) + 1) && i - firstX == game.getQuadrantX(game.getPlayerX()))     ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()))     && i - firstX == game.getQuadrantX(game.getPlayerX()) + 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()) - 1) && i - firstX == game.getQuadrantX(game.getPlayerX()) - 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()) - 1) && i - firstX == game.getQuadrantX(game.getPlayerX()))     ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()))     && i - firstX == game.getQuadrantX(game.getPlayerX()) - 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()) + 1) && i - firstX == game.getQuadrantX(game.getPlayerX()) - 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()) - 1) && i - firstX == game.getQuadrantX(game.getPlayerX()) + 1) ||
+					  
+					  (j == (game.getQuadrantY(game.getPlayerY()))     && i - firstX == game.getQuadrantX(game.getPlayerX()))     ||
+					  
+					  ((game.getQuadrantX(game.getPlayerX())) == 0     &&
+							  (
+									  j == (game.getQuadrantY(game.getPlayerY()))     || 
+									  j == (game.getQuadrantY(game.getPlayerY()) + 1) || 
+									  j == (game.getQuadrantY(game.getPlayerY()) - 1)
+							  ) 
+							                                           && i - firstX == game.getQuadrantX(game.getPlayerX()) + 7
+					  )                                                                                                           ||
+					  
+					  ((game.getQuadrantX(game.getPlayerX())) == 7     &&
+						  (
+								  j == (game.getQuadrantY(game.getPlayerY()))     || 
+								  j == (game.getQuadrantY(game.getPlayerY()) + 1) || 
+								  j == (game.getQuadrantY(game.getPlayerY()) - 1)
+						  ) 
+						                                           && i - firstX == game.getQuadrantX(game.getPlayerX()) - 7
+					  )                                                                                                           ||
+					  
+					  ((game.getQuadrantY(game.getPlayerY())) == 0     &&
+						  (
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()))     || 
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()) + 1) || 
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()) - 1)
+						  ) 
+						                                           && j == game.getQuadrantY(game.getPlayerY()) + 7               
+					  )                                                                                                           ||
+					  
+					  
+					  ((game.getQuadrantY(game.getPlayerY())) == 7     &&
+						  (
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()))     || 
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()) + 1) || 
+								  i - firstX == (game.getQuadrantX(game.getPlayerX()) - 1)
+						  ) 
+						                                           && j == game.getQuadrantY(game.getPlayerY()) - 7               
+					  )                                                                                                           
+					  
+				  ) {
+					
+					System.out.print(game.getTotalAliensQuadrant(i - firstX, j) + "" + game.getTotalBasesQuadrant(i - firstX, j) + game.getTotalStarsQuadrant(i - firstX, j) + ( j < 7 ? "   " : " "));
+				
+				} else {
+					System.out.print("---" + ( j < 7 ? "   " : " "));
+				}
 			
 			}
 			System.out.print("|");

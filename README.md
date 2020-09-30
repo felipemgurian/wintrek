@@ -54,6 +54,7 @@ Caso o a nave fique 1 casa ao lado da base espacial, a vida, os canhões fotonic
 
 **Implementar funções do computador**
 
-**Melhorar lógica do long range, mostrar apenas vizinhos**
-
 **Melhorar tratamento de exceção**
+
+**Modificar coodenadas x e y para A1, A2 ..**
+

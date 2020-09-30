@@ -1,9 +1,7 @@
 package br.fsa.wintrek.cli;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
-import br.fsa.wintrek.kernel.Coordinates;
 import br.fsa.wintrek.kernel.Kernel;
 
 public class CLI {
@@ -25,6 +23,7 @@ public class CLI {
 		  System.out.println("press \"help\" to see available commands!");
 		  
 		  int round = 0;
+		  
 		  while(true) {
 			  if(game.getTimer() > 3024000 || game.getPlayerLife() <= 0) {
 				  System.out.println("GAME OVER!");
@@ -458,7 +457,7 @@ public class CLI {
 					for(int k = 0; k < game.aliens.length; k++) {
 						if(game.aliens[k].getX() == i && game.aliens[k].getY() == j) {
 							
-							System.out.println("Alien("+j+", "+i+") life: " + game.aliens[k].getLife());
+							System.out.println("Alien("+game.getSectionY(j)+", "+game.getSectionX(i)+") life: " + game.aliens[k].getLife());
 							
 						}
 					}

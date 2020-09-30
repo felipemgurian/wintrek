@@ -368,17 +368,17 @@ public class Kernel {
 				if(hasStar) {
 					System.out.println();
 					System.out.println("A Star in the way blocks the shoot!");
-					System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
+					System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" don't receive damage");
 					continue;
 				}
 				
 				this.aliens[index].damage(damage/aliensInArray);
 				this.totalEnergy -= (damage/aliensInArray);
-				System.out.println("Alien in pos "+y+"-"+x+" receive damage "+(damage/aliensInArray));
-				System.out.println("Alien in pos "+y+"-"+x+" life is " + this.aliens[index].getLife());
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" receive damage "+(damage/aliensInArray));
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionY(x)+" life is " + this.aliens[index].getLife());
 
 				if(this.aliens[index].getLife() <= 0) {
-					System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
+					System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" was destroyed!");
 					this.world[x][y] = 0;
 					this.totalAliens--;
 					this.aliens[index].setX(-1);
@@ -423,17 +423,17 @@ public class Kernel {
 			if(hasStar) {
 				System.out.println();
 				System.out.println("A Star in the way blocks the shoot!");
-				System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" don't receive damage");
 				return false;
 			}
 			
 			this.aliens[closestAlienIndex].damage(damage);
 			this.totalEnergy -= (damage/aliensInArray);
-			System.out.println("Alien in pos "+y+"-"+x+" receive damage "+(damage));
-			System.out.println("Alien in pos "+y+"-"+x+" life is " + this.aliens[closestAlienIndex].getLife());
+			System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" receive damage "+(damage));
+			System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" life is " + this.aliens[closestAlienIndex].getLife());
 
 			if(this.aliens[closestAlienIndex].getLife() <= 0) {
-				System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" was destroyed!");
 				this.world[x][y] = 0;
 				this.totalAliens--;
 				this.aliens[closestAlienIndex].setX(-1);
@@ -533,7 +533,7 @@ public class Kernel {
 			if(hasStar) {
 				System.out.println();
 				System.out.println("A Star in the way blocks the shoot!");
-				System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" don't receive damage");
 				this.totalPhoton--;
 				return false;
 			}
@@ -548,7 +548,7 @@ public class Kernel {
 						this.totalAliens--;
 						this.aliens[i].setX(-1);
 						this.aliens[i].setY(-1);
-						System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
+						System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" was destroyed!");
 					}
 					
 					return true;
@@ -706,7 +706,7 @@ public class Kernel {
 	
 	public int getSectionX(int x) {
 		int quadrantX = (int) Math.ceil((x)/8);
-		int lastX = ((quadrantX + 1) * 8) - 1;
+		int lastX = getLastX(quadrantX);
 		
 		int diff = lastX - x;
 	
@@ -717,7 +717,7 @@ public class Kernel {
 	
 	public int getSectionY(int y) {
 		int quadrantY = (int) Math.ceil((y)/8);
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int lastY = getLastY(quadrantY);
 		
 		int diff = lastY - y;
 	

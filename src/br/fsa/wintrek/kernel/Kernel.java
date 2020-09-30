@@ -20,7 +20,7 @@ public class Kernel {
 	//VARIABLES
 	Random random;
 	int[][] world;
-	Alien[] aliens;
+	public Alien[] aliens;
 	int playerX       = 0;
 	int playerY       = 0;
 	int playerLife    = MAXPLAYERLIFE;
@@ -208,8 +208,8 @@ public class Kernel {
 
 			 }
 		 
-			for(int i = firstX; i < lastX; i++) {
-		    	 for(int j = firstY; j < lastY; j++) {
+			for(int i = firstX; i <= lastX; i++) {
+		    	 for(int j = firstY; j <= lastY; j++) {
 		    		if(hasAlien(i, j)) {
 
 		    			phaserAttackAlien(i, j);
@@ -368,17 +368,17 @@ public class Kernel {
 				if(hasStar) {
 					System.out.println();
 					System.out.println("A Star in the way blocks the shoot!");
-					System.out.println("Alien in pos "+x+"-"+y+" don't receive damage");
+					System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
 					continue;
 				}
 				
 				this.aliens[index].damage(damage/aliensInArray);
 				this.totalEnergy -= (damage/aliensInArray);
-				System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage/aliensInArray));
-				System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[index].getLife());
+				System.out.println("Alien in pos "+y+"-"+x+" receive damage "+(damage/aliensInArray));
+				System.out.println("Alien in pos "+y+"-"+x+" life is " + this.aliens[index].getLife());
 
 				if(this.aliens[index].getLife() <= 0) {
-					System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+					System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
 					this.world[x][y] = 0;
 					this.totalAliens--;
 					this.aliens[index].setX(-1);
@@ -409,21 +409,31 @@ public class Kernel {
 			int y = this.aliens[closestAlienIndex].getY();
 			
 			ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
-
+			
+			boolean hasStar = false;
+			
 			for(int j = 0; j < coordinatesToAlien.size(); j++) {
+								
 				if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
-					System.out.println("A Star in the way blocks the shoot!");
+					hasStar = true;
 					continue;
 				}
 			}
 			
+			if(hasStar) {
+				System.out.println();
+				System.out.println("A Star in the way blocks the shoot!");
+				System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
+				return false;
+			}
+			
 			this.aliens[closestAlienIndex].damage(damage);
 			this.totalEnergy -= (damage/aliensInArray);
-			System.out.println("Alien in pos "+x+"-"+y+" receive damage "+(damage));
-			System.out.println("Alien in pos "+x+"-"+y+" life is " + this.aliens[closestAlienIndex].getLife());
+			System.out.println("Alien in pos "+y+"-"+x+" receive damage "+(damage));
+			System.out.println("Alien in pos "+y+"-"+x+" life is " + this.aliens[closestAlienIndex].getLife());
 
 			if(this.aliens[closestAlienIndex].getLife() <= 0) {
-				System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+				System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
 				this.world[x][y] = 0;
 				this.totalAliens--;
 				this.aliens[closestAlienIndex].setX(-1);
@@ -523,7 +533,7 @@ public class Kernel {
 			if(hasStar) {
 				System.out.println();
 				System.out.println("A Star in the way blocks the shoot!");
-				System.out.println("Alien in pos "+x+"-"+y+" don't receive damage");
+				System.out.println("Alien in pos "+y+"-"+x+" don't receive damage");
 				this.totalPhoton--;
 				return false;
 			}
@@ -538,7 +548,7 @@ public class Kernel {
 						this.totalAliens--;
 						this.aliens[i].setX(-1);
 						this.aliens[i].setY(-1);
-						System.out.println("Alien in pos "+x+"-"+y+" was destroyed!");
+						System.out.println("Alien in pos "+y+"-"+x+" was destroyed!");
 					}
 					
 					return true;
@@ -652,6 +662,14 @@ public class Kernel {
 	public int getQuadrantY(int y) {
 		int quadrantY = (int) Math.ceil((y)/8);
 		return quadrantY;
+	}
+	
+	public int getLastX(int quadrantX) {
+		return ((quadrantX + 1) * 8) - 1;
+	}
+	
+	public int getLastY(int quadrantY) {
+		return ((quadrantY + 1) * 8) - 1;
 	}
 	
 	public int getRealPlayerX(int x) {

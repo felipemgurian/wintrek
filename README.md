@@ -2,6 +2,8 @@
 
 ## FUNCIONALIDADES IMPLEMENTADAS:
 
+### COMANDOS
+
 **help            - Show help commands.**
 
 (IMPLEMENTADO 100%)
@@ -34,6 +36,10 @@
 
 (IMPLEMENTADO 100%)
 
+**scan            - Scan the current sector.**
+
+(IMPLEMENTADO 100%)
+
 ### MOVIMENTAÇÃO NAVE INIMIGA
 
 (IMPLEMENTADO 100%)
@@ -42,19 +48,31 @@
 
 (IMPLEMENTADO 100%)
 
+### CONTROLE DE ARMAS
+
+(IMPLEMENTADO 100%)
+
+### CONTROLE DE NAVEGAÇÃO
+
+(IMPLEMENTADO 100%)
+
+### CONTROLE DE ESCUDOS
+
+(IMPLEMENTADO 100%)
+
+### GERENCIAMENTO DE ENERGIA
+
+(IMPLEMENTADO 100%)
+
+### CONTROLE DE BORDO
+
+IMPLEMENTADO SCAN DE QUADRANTE
+
 ### TEMPO NO JOGO
 
-A cada segundo é somado 1 segundo no tempo do jogo, caso o jogador efetue algum tipo de movimentação, warp ou impulse, será somado 1 dia no tempo em segundos.
+A cada segundo é somado 1 segundo no tempo do jogo, caso o jogador efetue algum tipo de movimentação, warp ou impulse, será somado 1 dia * distancia no tempo em segundos.
 
 ### RESTAURAÇÃO DA NAVA
 
 Caso o a nave fique 1 casa ao lado da base espacial, a vida, os canhões fotonicos e a energia serão restauradas ao máximo
-
-## NECESSÁRIO IMPLEMENTAR:
-
-**Implementar funções do computador**
-
-**Melhorar tratamento de exceção**
-
-**Modificar coodenadas x e y para A1, A2 ..**
 

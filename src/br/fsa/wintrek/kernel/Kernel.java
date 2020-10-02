@@ -1,5 +1,6 @@
 package br.fsa.wintrek.kernel;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -19,19 +20,19 @@ public class Kernel {
 
 	//VARIABLES
 	Random random;
-	int[][] world;
+	private int[][] world;
 	public Alien[] aliens;
-	int playerX       = 0;
-	int playerY       = 0;
-	int playerLife    = MAXPLAYERLIFE;
-	int totalAliens   = 20;
-	int totalStars    = 20;
-	int totalBases    = 3;
-	int totalEnergy   = 3000;
-	int totalShield   = 0;
-	int totalPhoton   = 10;
-	int phaserPower   = 0;
-	int timer         = 0;
+	private int playerX       = 0;
+	private int playerY       = 0;
+	private int playerLife    = MAXPLAYERLIFE;
+	private int totalAliens   = 20;
+	private int totalStars    = 20;
+	private int totalBases    = 3;
+	private int totalEnergy   = 3000;
+	private int totalShield   = 0;
+	private int totalPhoton   = 10;
+	private int phaserPower   = 0;
+	private int timer         = 0;
 	
 	public Kernel() {
 		this.world = new int[64][64];
@@ -61,6 +62,12 @@ public class Kernel {
 		  }).start();
 		 
     }
+    
+    /**
+     * 
+     * START BOARD
+     * 
+     */
 	
     private void startBoard() {
     	addPlayer();
@@ -153,167 +160,143 @@ public class Kernel {
 	        y = random.nextInt(63);
 		}
 	}
+	public void saveGame() {
+      File mySaveFile = new File("save.save");
+
+	}
 	
-	public boolean impulse(int angle, int dist) {
+	/*
+	 * 
+	 * RESTART BOARD
+	 * 
+	 */
+	
+	public void restartBoard() {
+		this.playerX       = 0;
+		this.playerY       = 0;
+		this.playerLife    = MAXPLAYERLIFE;
+		this.totalAliens   = 20;
+		this.totalStars    = 20;
+		this.totalBases    = 3;
+		this.totalEnergy   = 3000;
+		this.totalShield   = 0;
+		this.totalPhoton   = 10;
+		this.phaserPower   = 0;
+		this.timer         = 0;
+		
+		for(int i = 0; i < this.aliens.length; i++) {
+			this.aliens[i] = null;
+		}
+		
+		for(int i = 0; i < 63; i++) {
+			for(int j = 0; j < 63; j++) {
+				this.world[i][j] = 0;
+			}
+		}
+		
+    	addPlayer();
+    	addAliens();
+    	addStars();
+    	addBases();
+		
+	}
+	
+	/**
+	 * 
+	 * SHIELD LOGIC
+	 * 
+	 */
+	
+	public boolean increaseShield(int amount) {
+		if(this.totalEnergy > amount) {
+			this.totalShield += amount;
+			this.totalEnergy -= amount;
+			
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean decreaseShield(int amount) {
+		if(this.totalShield >= amount) {
+			this.totalShield -= amount;
+			this.totalEnergy += amount;
+			
+			return true;
+		}
+		return false;
+	}
+	
+	public int getShield() {
+		return this.totalShield;
+	}
+	
+	
+	/**
+	 * 
+	 * WEAPONS LOGIC
+	 * 
+	 */
+    
+	public boolean photonAttack(int angle, int dist) {
 		int x = getXWithAngle(angle, dist) + this.playerX;
 		int y = getYWithAngle(angle, dist) + this.playerY;
 		
-		int quadrantX = getQuadrantX(x);
-		int quadrantY = getQuadrantY(y);
-		
 		int quadrantPlayerX = getQuadrantX(this.playerX);
 		int quadrantPlayerY = getQuadrantY(this.playerY);
 
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int quadrantX = getQuadrantX(x);
+		int quadrantY = getQuadrantY(y);
 		
-		int firstX = lastX - 7;
-		int firstY = lastY - 7;
-		
-		if(x < 0 || x > 63 || y < 0 || y > 63 || quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY) return false;
-		
-		if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
-			this.world[this.playerX][this.playerY] = 0;
-			this.world[x][y] |= PLAYER;
-			this.playerX = x;
-			this.playerY = y;
-			this.timer += dist*86400;
-			
-			 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
-	    		 totalEnergy = 3000 - totalShield;
-	    		 playerLife = MAXPLAYERLIFE;
-	    		 totalPhoton = MAXPHOTON;
-        		 System.out.println("Status restored!");
-
-			 }
-			 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
-	    		 totalEnergy = 3000 - totalShield;
-	    		 playerLife = MAXPLAYERLIFE;
-	    		 totalPhoton = MAXPHOTON;
-        		 System.out.println("Status restored!");
-
-			 }
-			 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
-	    		 totalEnergy = 3000 - totalShield;
-	    		 playerLife = MAXPLAYERLIFE;
-	    		 totalPhoton = MAXPHOTON;
-        		 System.out.println("Status restored!");
-
-			 }
-			 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
-	    		 totalEnergy = 3000 - totalShield;
-	    		 playerLife = MAXPLAYERLIFE;
-	    		 totalPhoton = MAXPHOTON;
-        		 System.out.println("Status restored!");
-
-			 }
-		 
-			for(int i = firstX; i <= lastX; i++) {
-		    	 for(int j = firstY; j <= lastY; j++) {
-		    		if(hasAlien(i, j)) {
-
-		    			phaserAttackAlien(i, j);
-		    			
-		    			int angleAlien = (int) ((Math.random() * (359 - 0)) + 0);
-						int distAlien = 1;
-						
-						impulseAlien(i, j, angleAlien, distAlien);
-
-		    		}
-		    	 }
-	    	 }
-			
-			return true;
+		if(quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY || x < 0 || x > 63 || y < 0 || y > 63) {
+			System.out.println();
+			System.out.println("You miss the shoot!");
+			this.totalPhoton--;
+			return false;
 		}
 		
-		return false;
-	}
-	public boolean impulseAlien(int alienX, int alienY, int angle, int dist) {
-		int x = getXWithAngle(angle, dist) + alienX;
-		int y = getYWithAngle(angle, dist) + alienY;
-		
-		int quadrantX = getQuadrantX(x);
-		int quadrantY = getQuadrantY(y);
-		
-		int quadrantPlayerX = getQuadrantX(this.playerX);
-		int quadrantPlayerY = getQuadrantY(this.playerY);
 
-		
-		if(x < 0 || x > 63 || y < 0 || y > 63 || quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY) return false;
-
-		if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y) && x != this.playerX && y != this.playerY) {
+		if(hasAlien(x, y)) {
 			
-			this.world[x][y] |= ALIEN;
-			this.world[alienX][alienY] = 0;
+			ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
 			
-			for(int i = 0; i < this.aliens.length; i++) {
-				if(this.aliens[i].getX() == alienX && this.aliens[i].getY() == alienY) {
-					this.aliens[i].setX(x);
-					this.aliens[i].setY(y);
+			boolean hasStar = false;
+			
+			for(int j = 0; j < coordinatesToAlien.size(); j++) {
+				if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
+					hasStar = true;
+					break;
 				}
 			}
 			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	
-	public boolean warp(int angle, int dist) {
-		int quadrantX = getXWithAngle(angle, dist) + getQuadrantX(this.playerX);
-		int quadrantY = getYWithAngle(angle, dist) + getQuadrantY(this.playerY);
-		
-		if(quadrantX < 0 || quadrantX > 7 || quadrantY < 0 || quadrantY > 7) return false;
-
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
-		
-		int firstX = lastX - 7;
-		int firstY = lastY - 7;
-
-		while(true) {
-			int x = (int) ((Math.random() * (lastX - firstX)) + firstX);
-			int y = (int) ((Math.random() * (lastY - firstY)) + firstY);
+			if(hasStar) {
+				System.out.println();
+				System.out.println("A Star in the way blocks the shoot!");
+				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" don't receive damage");
+				this.totalPhoton--;
+				return false;
+			}
 			
-			if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
-				this.world[x][y] |= PLAYER;
-				this.world[this.playerX][this.playerY] = 0;
-				this.playerX = x;
-				this.playerY = y;
-				this.timer = this.timer + dist*86400;
-				
-				 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
-            		 totalEnergy = 3000 - totalShield;
-            		 playerLife = MAXPLAYERLIFE;
-            		 totalPhoton = MAXPHOTON;
-            		 System.out.println("Status restored!");
-				 }
-        		 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
-            		 totalEnergy = 3000 - totalShield;
-            		 playerLife = MAXPLAYERLIFE;
-            		 totalPhoton = MAXPHOTON;
-            		 System.out.println("Status restored!");
-
-				 }
-        		 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
-            		 totalEnergy = 3000 - totalShield;
-            		 playerLife = MAXPLAYERLIFE;
-            		 totalPhoton = MAXPHOTON;
-            		 System.out.println("Status restored!");
-
-				 }
-        		 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
-            		 totalEnergy = 3000 - totalShield;
-            		 playerLife = MAXPLAYERLIFE;
-            		 totalPhoton = MAXPHOTON;
-            		 System.out.println("Status restored!");
-
-				 }
-				return true;
+			for(int i = 0; i < this.aliens.length; i++) {
+				if(this.aliens[i].getX() == x && this.aliens[i].getY() == y) {
+					this.aliens[i].damage(this.aliens[i].getLife());
+					this.totalPhoton--;
+					
+					if(this.aliens[i].getLife() <= 0) {
+						this.world[x][y] = 0;
+						this.totalAliens--;
+						this.aliens[i].setX(-1);
+						this.aliens[i].setY(-1);
+						System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" was destroyed!");
+					}
+					
+					return true;
+				}
 			}
 		}
-		
+		this.totalPhoton--;
+		System.out.println("You miss the shoot!");
+		return false;
 	}
 	
 	public boolean phaserAttack(int attackType, int damage) {
@@ -325,8 +308,8 @@ public class Kernel {
 		int quadrantX = (int) Math.ceil((this.playerX)/8);
 		int quadrantY = (int) Math.ceil((this.playerY)/8);
 				
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		
 		int firstX = lastX - 7;
 		int firstY = lastY - 7;
@@ -446,6 +429,189 @@ public class Kernel {
 		return false;
 	}
 	
+	public int getPhoton() {
+		return this.totalPhoton;
+	}
+	
+	public int getPhaserPower() {
+		return this.phaserPower;
+	}
+	
+	
+	/**
+	 * 
+	 * NAVIGATION LOGIC
+	 * 
+	 */
+	
+	public boolean warp(int angle, int dist) {
+		int quadrantX = getXWithAngle(angle, dist) + getQuadrantX(this.playerX);
+		int quadrantY = getYWithAngle(angle, dist) + getQuadrantY(this.playerY);
+		
+		if(quadrantX < 0 || quadrantX > 7 || quadrantY < 0 || quadrantY > 7) return false;
+
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
+		
+		int firstX = lastX - 7;
+		int firstY = lastY - 7;
+
+		while(true) {
+			int x = (int) ((Math.random() * (lastX - firstX)) + firstX);
+			int y = (int) ((Math.random() * (lastY - firstY)) + firstY);
+			
+			if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
+				this.world[x][y] |= PLAYER;
+				this.world[this.playerX][this.playerY] = 0;
+				this.playerX = x;
+				this.playerY = y;
+				this.timer = this.timer + dist*86400;
+				
+				 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+				 }
+        		 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
+        		 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
+        		 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
+            		 totalEnergy = 3000 - totalShield;
+            		 playerLife = MAXPLAYERLIFE;
+            		 totalPhoton = MAXPHOTON;
+            		 System.out.println("Status restored!");
+
+				 }
+				return true;
+			}
+		}
+		
+	}
+	
+	public boolean impulse(int angle, int dist) {
+		int x = getXWithAngle(angle, dist) + this.playerX;
+		int y = getYWithAngle(angle, dist) + this.playerY;
+		
+		int quadrantX = getQuadrantX(x);
+		int quadrantY = getQuadrantY(y);
+		
+		int quadrantPlayerX = getQuadrantX(this.playerX);
+		int quadrantPlayerY = getQuadrantY(this.playerY);
+
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
+		
+		int firstX = lastX - 7;
+		int firstY = lastY - 7;
+		
+		if(x < 0 || x > 63 || y < 0 || y > 63 || quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY) return false;
+		
+		if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y)) {
+			this.world[this.playerX][this.playerY] = 0;
+			this.world[x][y] |= PLAYER;
+			this.playerX = x;
+			this.playerY = y;
+			this.timer += dist*86400;
+			
+			 if(playerX < 63 && hasBase((playerX+1), playerY)) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerX > 0 && hasBase((playerX-1), playerY)) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerY < 63 && hasBase(playerX, (playerY+1))) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+			 else if(playerY > 0 && hasBase(playerX, (playerY-1))) { 
+	    		 totalEnergy = 3000 - totalShield;
+	    		 playerLife = MAXPLAYERLIFE;
+	    		 totalPhoton = MAXPHOTON;
+        		 System.out.println("Status restored!");
+
+			 }
+		 
+			for(int i = firstX; i <= lastX; i++) {
+		    	 for(int j = firstY; j <= lastY; j++) {
+		    		if(hasAlien(i, j)) {
+
+		    			phaserAttackAlien(i, j);
+		    			
+		    			int angleAlien = (int) ((Math.random() * (359 - 0)) + 0);
+						int distAlien = 1;
+						
+						impulseAlien(i, j, angleAlien, distAlien);
+
+		    		}
+		    	 }
+	    	 }
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * ALIEN LOGIC
+	 * 
+	 */
+	
+	public boolean impulseAlien(int alienX, int alienY, int angle, int dist) {
+		int x = getXWithAngle(angle, dist) + alienX;
+		int y = getYWithAngle(angle, dist) + alienY;
+		
+		int quadrantX = getQuadrantX(x);
+		int quadrantY = getQuadrantY(y);
+		
+		int quadrantPlayerX = getQuadrantX(this.playerX);
+		int quadrantPlayerY = getQuadrantY(this.playerY);
+
+		
+		if(x < 0 || x > 63 || y < 0 || y > 63 || quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY) return false;
+
+		if(!hasAlien(x, y) && !hasStar(x, y) && !hasBase(x, y) && x != this.playerX && y != this.playerY) {
+			
+			this.world[x][y] |= ALIEN;
+			this.world[alienX][alienY] = 0;
+			
+			for(int i = 0; i < this.aliens.length; i++) {
+				if(this.aliens[i].getX() == alienX && this.aliens[i].getY() == alienY) {
+					this.aliens[i].setX(x);
+					this.aliens[i].setY(y);
+				}
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public boolean phaserAttackAlien(int alienX, int alienY) {
 		
 		int quadrantX = (int) Math.ceil((alienX)/8);
@@ -499,107 +665,19 @@ public class Kernel {
 		return false;
 	}
 	
-	public boolean photonAttack(int angle, int dist) {
-		int x = getXWithAngle(angle, dist) + this.playerX;
-		int y = getYWithAngle(angle, dist) + this.playerY;
-		
-		int quadrantPlayerX = getQuadrantX(this.playerX);
-		int quadrantPlayerY = getQuadrantY(this.playerY);
-
-		int quadrantX = getQuadrantX(x);
-		int quadrantY = getQuadrantY(y);
-		
-		if(quadrantX != quadrantPlayerX || quadrantY != quadrantPlayerY || x < 0 || x > 63 || y < 0 || y > 63) {
-			System.out.println();
-			System.out.println("You miss the shoot!");
-			this.totalPhoton--;
-			return false;
-		}
-		
-
-		if(hasAlien(x, y)) {
-			
-			ArrayList<Coordinates> coordinatesToAlien = getLine(this.playerX, this.playerY, x, y);
-			
-			boolean hasStar = false;
-			
-			for(int j = 0; j < coordinatesToAlien.size(); j++) {
-				if(hasStar(coordinatesToAlien.get(j).getX(), coordinatesToAlien.get(j).getY())) {
-					hasStar = true;
-					break;
-				}
-			}
-			
-			if(hasStar) {
-				System.out.println();
-				System.out.println("A Star in the way blocks the shoot!");
-				System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" don't receive damage");
-				this.totalPhoton--;
-				return false;
-			}
-			
-			for(int i = 0; i < this.aliens.length; i++) {
-				if(this.aliens[i].getX() == x && this.aliens[i].getY() == y) {
-					this.aliens[i].damage(this.aliens[i].getLife());
-					this.totalPhoton--;
-					
-					if(this.aliens[i].getLife() <= 0) {
-						this.world[x][y] = 0;
-						this.totalAliens--;
-						this.aliens[i].setX(-1);
-						this.aliens[i].setY(-1);
-						System.out.println("Alien in pos "+getSectionY(y)+"-"+getSectionX(x)+" was destroyed!");
-					}
-					
-					return true;
-				}
-			}
-		}
-		this.totalPhoton--;
-		System.out.println("You miss the shoot!");
-		return false;
-	}
+	/*
+	 * 
+	 *  GETTERS
+	 *  
+	 */
 	
-	
-	public void setOneQuadrant(int quadrantX, int quadrantY) {
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
-		
-		for(int i = lastX; i > lastX - 8; i--) {
-			for(int j = lastY; j > lastY - 8; j--) {
-				this.world[i][j] = 1;
-			}
-		}
-	}
-	
-	public boolean increaseShield(int amount) {
-		if(this.totalEnergy > amount) {
-			this.totalShield += amount;
-			this.totalEnergy -= amount;
-			
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean decreaseShield(int amount) {
-		if(this.totalShield >= amount) {
-			this.totalShield -= amount;
-			this.totalEnergy += amount;
-			
-			return true;
-		}
-		return false;
-	}
-	
-	//GETS
 	public int[][] getWorld() {
 		return this.world;
 	}
 	
 	public int getTotalAliensQuadrant(int quadrantX, int quadrantY) {
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		int firstX = lastX - 7;
 		int firstY = lastY - 7;
 		
@@ -617,8 +695,8 @@ public class Kernel {
 	}
 
 	public int getTotalStarsQuadrant(int quadrantX, int quadrantY) {
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		int firstX = lastX - 7;
 		int firstY = lastY - 7;
 		
@@ -636,8 +714,8 @@ public class Kernel {
 	}
 	
 	public int getTotalBasesQuadrant(int quadrantX, int quadrantY) {
-		int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+		int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		int firstX = lastX - 7;
 		int firstY = lastY - 7;
 		
@@ -655,13 +733,11 @@ public class Kernel {
 	}
 	
 	public int getQuadrantX(int x) {
-	 	int quadrantX = (int) Math.ceil((x)/8);
-	 	return quadrantX;
+	 	return (int) Math.ceil((x)/8);
 	}
 	
 	public int getQuadrantY(int y) {
-		int quadrantY = (int) Math.ceil((y)/8);
-		return quadrantY;
+		return (int) Math.ceil((y)/8);
 	}
 	
 	public int getLastX(int quadrantX) {
@@ -674,7 +750,7 @@ public class Kernel {
 	
 	public int getRealPlayerX(int x) {
         int quadrantX = getQuadrantX(this.playerX);
-        int lastX = ((quadrantX + 1) * 8) - 1;
+        int lastX = getLastX(quadrantX);
         int diff = 7 - x;
         int realPlayerX = lastX - diff;
 		return realPlayerX;
@@ -682,7 +758,7 @@ public class Kernel {
 	
 	public int getRealPlayerY(int y) {
         int quadrantY = getQuadrantY(this.playerY);
-        int lastY = ((quadrantY + 1) * 8) - 1;
+        int lastY = getLastY(quadrantY);
         int diff = 7 - y;
         int realPlayerY = lastY - diff;
 		return realPlayerY;
@@ -690,7 +766,7 @@ public class Kernel {
 	
 	public int getRealX(int x, int comparative) {
         int quadrantX = getQuadrantX(comparative);
-        int lastX = ((quadrantX + 1) * 8) - 1;
+        int lastX = getLastX(quadrantX);
         int diff = 7 - x;
         int realPlayerX = lastX - diff;
 		return realPlayerX;
@@ -698,14 +774,14 @@ public class Kernel {
 	
 	public int getRealY(int y, int comparative) {
         int quadrantY = getQuadrantY(comparative);
-        int lastY = ((quadrantY + 1) * 8) - 1;
+        int lastY = getLastY(quadrantY);
         int diff = 7 - y;
         int realPlayerY = lastY - diff;
 		return realPlayerY;
 	}
 	
 	public int getSectionX(int x) {
-		int quadrantX = (int) Math.ceil((x)/8);
+		int quadrantX = getQuadrantX(x);
 		int lastX = getLastX(quadrantX);
 		
 		int diff = lastX - x;
@@ -716,7 +792,7 @@ public class Kernel {
 	}
 	
 	public int getSectionY(int y) {
-		int quadrantY = (int) Math.ceil((y)/8);
+		int quadrantY = getQuadrantY(y);
 		int lastY = getLastY(quadrantY);
 		
 		int diff = lastY - y;
@@ -733,20 +809,8 @@ public class Kernel {
 		return this.playerY;
 	}
 	
-	public int getShield() {
-		return this.totalShield;
-	}
-	
 	public int getEnergy() {
 		return this.totalEnergy;
-	}
-	
-	public int getPhoton() {
-		return this.totalPhoton;
-	}
-	
-	public int getPhaserPower() {
-		return this.phaserPower;
 	}
 	
 	public int getAliens() {
@@ -777,6 +841,38 @@ public class Kernel {
 		return y;
 	}
 	
+	public int getAngle(int y, int x) {
+	    int angle =  (int) Math.round(Math.toDegrees( Math.atan2( getSectionX(this.playerX) - x, y - getSectionY(this.playerY) ) ));
+
+	    if(angle < 0) {
+	    	angle += 360;
+	    }
+	    
+	    return angle;
+	}
+	
+	public int getDistance(int y, int x) {
+	    double distance = Math.round(Math.sqrt((x - getSectionX(this.playerX)) * (x - getSectionX(this.playerX)) + (y - getSectionY(this.playerY)) * (y - getSectionY(this.playerY))));
+	    	    
+	    return (int) distance;
+	}
+	
+	public int getAngleQuadrant(int y, int x) {
+	    int angle =  (int) Math.round(Math.toDegrees( Math.atan2( getQuadrantX(this.playerX) - x, y - getQuadrantY(this.playerY) ) ));
+
+	    if(angle < 0) {
+	    	angle += 360;
+	    }
+	    
+	    return angle;
+	}
+	
+	public int getDistanceQuadrant(int y, int x) {
+	    double distance = Math.round(Math.sqrt((x - getQuadrantX(this.playerX)) * (x - getQuadrantX(this.playerX)) + (y - getQuadrantY(this.playerY)) * (y - getQuadrantY(this.playerY))));
+	    	    
+	    return (int) distance;
+	}
+	
 	public ArrayList<Coordinates> getLine(int xi, int yi, int xf, int yf) {
 		
 		ArrayList<Coordinates> coordinates = new ArrayList<Coordinates>();
@@ -805,7 +901,11 @@ public class Kernel {
 
 	}
 	
-	//CHECKS
+	/*
+	 * 
+	 * CHECKS
+	 * 
+	 */
     public boolean hasAlien(int x, int y) {
     	if(this.world[x][y] == (this.world[x][y] | ALIEN)) return true;
     	return false;
@@ -826,12 +926,46 @@ public class Kernel {
     	return false;
     }
     
-    public boolean limitAlienQuadrant(int x, int y) {
-    	int quadrantX = (int) Math.ceil((x)/8);
-    	int quadrantY = (int) Math.ceil((y)/8);
+    public boolean checkAlienQuadrant(int x, int y) {
+    	int quadrantX = getQuadrantX(x);
+    	int quadrantY = getQuadrantY(y);
     	
-    	int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+    	int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
+		
+		for(int i = lastX; i > lastX - 8; i--) {
+			for(int j = lastY; j > lastY - 8; j--) {
+				if(this.world[i][j] == (this.world[i][j] | ALIEN) ) {
+					return true;
+				}
+			}
+		}
+    	
+    	return false;
+    }
+    
+    /*
+     * 
+     * SETTERS
+     * 
+     */
+    
+    public void suicide() {
+    	this.playerLife = 0;
+    }
+    
+    /*
+     * 
+     * LIMITERS
+     * 
+     */
+    
+    public boolean limitAlienQuadrant(int x, int y) {
+    	int quadrantX = getQuadrantX(x);
+    	int quadrantY = getQuadrantY(y);
+    	
+    	int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		
 		int totalAliens = 0;
 
@@ -849,11 +983,11 @@ public class Kernel {
     }
     
     public boolean limitBaseQuadrant(int x, int y) {
-    	int quadrantX = (int) Math.ceil((x)/8);
-    	int quadrantY = (int) Math.ceil((y)/8);
+    	int quadrantX = getQuadrantX(x);
+    	int quadrantY = getQuadrantY(y);
     	
-    	int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY + 1) * 8) - 1;
+    	int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		
 		int totalBases = 0;
 
@@ -873,11 +1007,11 @@ public class Kernel {
     }
     
     public boolean limitStarQuadrant(int x, int y) {
-    	int quadrantX = (int) Math.ceil((x)/8);
-    	int quadrantY = (int) Math.ceil((y)/8);
+    	int quadrantX = getQuadrantX(x);
+    	int quadrantY = getQuadrantY(y);
     	
-    	int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY+ 1) * 8) - 1;
+    	int lastX = getLastX(quadrantX);
+		int lastY = getLastY(quadrantY);
 		
 		int totalStars = 0;
 
@@ -893,23 +1027,6 @@ public class Kernel {
     	
     	return false;
     }
-    
-    public boolean checkAlienQuadrant(int x, int y) {
-    	int quadrantX = (int) Math.ceil((x)/8);
-    	int quadrantY = (int) Math.ceil((y)/8);
-    	
-    	int lastX = ((quadrantX + 1) * 8) - 1;
-		int lastY = ((quadrantY+ 1) * 8) - 1;
-		
-		for(int i = lastX; i > lastX - 8; i--) {
-			for(int j = lastY; j > lastY - 8; j--) {
-				if(this.world[i][j] == (this.world[i][j] | ALIEN) ) {
-					return true;
-				}
-			}
-		}
-    	
-    	return false;
-    }
+  
     
 }

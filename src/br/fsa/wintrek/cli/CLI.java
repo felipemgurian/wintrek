@@ -16,31 +16,40 @@ public class CLI {
 			  		
 		  intro();
 		  
-		  Scanner sc = new Scanner(System.in);
+		  @SuppressWarnings("resource")
+	      Scanner sc = new Scanner(System.in);
 		  
 		  printGameScreen();
 		  
 		  System.out.println("press \"help\" to see available commands!");
 		  
-		  int round = 0;
+		  String temp;
+		  int x;
+		  int y;
+		  int dist;
+		  int angle;
+		  int energy;
+		  String attacktype;
+		  int attacktypeint;
 		  
 		  while(true) {
 			  if(game.getTimer() > 3024000 || game.getPlayerLife() <= 0) {
 				  System.out.println("GAME OVER!");
-				  break;
+				  System.out.print("Do you want play again?(yes|no) ");
+				  temp = sc.next();
+				  System.out.println();
+
+				  if(temp.equals("yes")) {
+					  game.restartBoard();
+					  init();
+				  }
+				  
+				  System.exit(1);
 			  }
 
 			  System.out.print("> ");
 			  String command = sc.next();
-			  String temp;
-			  int x;
-			  int y;
-			  int dist;
-			  int angle;
-			  int energy;
-			  String attacktype;
-			  int attacktypeint;
-			  
+
 			  switch(command) {
 				
 				  case "help":
@@ -62,7 +71,9 @@ public class CLI {
 					  System.out.println("photon          - Attack enemy with photon.");
 					  System.out.println();
 					  System.out.println("#COMPUTER COMMANDS");
-					  System.out.println("scan            - Scan the current sector.");
+					  System.out.println("scan            - Scan the current quadrant.");
+					  System.out.println("gets            - Get information from sector.");
+					  System.out.println("getq            - Get information from quadrant.");
 					  System.out.println();
 					  continue;
 					  
@@ -70,6 +81,10 @@ public class CLI {
 					  printGameScreen();
 					  continue;
 				  
+				  case "suicide":
+					  game.suicide();
+					  continue;
+					  
 				  case "warp":
 				  	  System.out.print("Angle: ");
 					  
@@ -211,6 +226,68 @@ public class CLI {
 				  case "scan":
 					  scanCurrentSector();
 					  continue;
+					  
+				  case "gets":
+					  
+				  	  System.out.print("x: ");
+
+					  temp = sc.next();
+					  
+					  try {
+					       x = Integer.parseInt(temp);
+				      } catch (NumberFormatException nfe) {
+					  	  System.out.println("Invalid x: Number");
+				    	  continue;
+				      }
+					  
+				  	  System.out.print("y: ");
+					  temp = sc.next();
+
+					  try {
+					       y = Integer.parseInt(temp);
+				      } catch (NumberFormatException nfe) {
+					  	  System.out.println("Invalid x: Number");
+				    	  continue;
+				      }
+					  System.out.println();
+
+					  System.out.println("Angle to sector: " + game.getAngle(x, y));
+					  System.out.println("Distance to sector: " + game.getDistance(x, y));
+					  
+					  System.out.println();
+
+					  continue;
+				  	  
+		  		 case "getq":
+					  
+				  	  System.out.print("x: ");
+
+					  temp = sc.next();
+					  
+					  try {
+					       x = Integer.parseInt(temp);
+				      } catch (NumberFormatException nfe) {
+					  	  System.out.println("Invalid x: Number");
+				    	  continue;
+				      }
+					  
+				  	  System.out.print("y: ");
+					  temp = sc.next();
+
+					  try {
+					       y = Integer.parseInt(temp);
+				      } catch (NumberFormatException nfe) {
+					  	  System.out.println("Invalid x: Number");
+				    	  continue;
+				      }
+					  System.out.println();
+
+					  System.out.println("Angle to quadrant: " + game.getAngleQuadrant(x, y));
+					  System.out.println("Distance to quadrant: " + game.getDistanceQuadrant(x, y));
+					  
+					  System.out.println();
+
+					  continue;
 				  	  
 				  default:
 					  System.out.println("Unexpected command");
@@ -337,7 +414,7 @@ public class CLI {
 			for(int j = firstY; j <= lastY; j++) {
 				System.out.print((world[i][j] == 1 ? "P" : world[i][j] == 2 ? "A" : world[i][j] == 4 ? "S" : world[i][j] == 8 ? "B" : " ") + " ");
 			}
-			//IMPLEMENTAR VERIFICAÇÃO APENAS PARA VIZINHOS
+
 			//Index linha Long Range
 			System.out.print(" |  " + (i - firstX) + "   |");
 			for(int j = 0; j < 8; j++) {
@@ -363,8 +440,8 @@ public class CLI {
 					  
 					  ((game.getQuadrantX(game.getPlayerX())) == 0     &&
 							  (
-									  j == (game.getQuadrantY(game.getPlayerY()))     || 
-									  j == (game.getQuadrantY(game.getPlayerY()) + 1) || 
+									  j == (game.getQuadrantY(game.getPlayerY()))          || 
+									  j == (game.getQuadrantY(game.getPlayerY()) + 1)      || 
 									  j == (game.getQuadrantY(game.getPlayerY()) - 1)
 							  ) 
 							                                           && i - firstX == game.getQuadrantX(game.getPlayerX()) + 7
@@ -372,11 +449,11 @@ public class CLI {
 					  
 					  ((game.getQuadrantX(game.getPlayerX())) == 7     &&
 						  (
-								  j == (game.getQuadrantY(game.getPlayerY()))     || 
-								  j == (game.getQuadrantY(game.getPlayerY()) + 1) || 
+								  j == (game.getQuadrantY(game.getPlayerY()))              || 
+								  j == (game.getQuadrantY(game.getPlayerY()) + 1)          || 
 								  j == (game.getQuadrantY(game.getPlayerY()) - 1)
 						  ) 
-						                                           && i - firstX == game.getQuadrantX(game.getPlayerX()) - 7
+						                                               && i - firstX == game.getQuadrantX(game.getPlayerX()) - 7
 					  )                                                                                                           ||
 					  
 					  ((game.getQuadrantY(game.getPlayerY())) == 0     &&
@@ -385,7 +462,7 @@ public class CLI {
 								  i - firstX == (game.getQuadrantX(game.getPlayerX()) + 1) || 
 								  i - firstX == (game.getQuadrantX(game.getPlayerX()) - 1)
 						  ) 
-						                                           && j == game.getQuadrantY(game.getPlayerY()) + 7               
+						                                               && j == game.getQuadrantY(game.getPlayerY()) + 7               
 					  )                                                                                                           ||
 					  
 					  
@@ -395,7 +472,7 @@ public class CLI {
 								  i - firstX == (game.getQuadrantX(game.getPlayerX()) + 1) || 
 								  i - firstX == (game.getQuadrantX(game.getPlayerX()) - 1)
 						  ) 
-						                                           && j == game.getQuadrantY(game.getPlayerY()) - 7               
+						                                               && j == game.getQuadrantY(game.getPlayerY()) - 7               
 					  )                                                                                                           
 					  
 				  ) {

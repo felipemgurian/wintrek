@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "title": "Threat Model Wintrek",
+    "owner": "Gurian"
+  },
+  "detail": {
+    "contributors": [
+      {
+        "name": "felipemgurian"
+      }
+    ],
+    "diagrams": [
+      {
+        "title": "Wintrek Diagram",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "diagramType": "STRIDE",
+        "id": 0
+      }
+    ],
+    "reviewer": "Gurian"
+  }
+}

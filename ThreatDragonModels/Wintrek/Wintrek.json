@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "title": "Wintrek",
+    "owner": "Gurian"
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "title": "Wintrek",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "diagramType": "STRIDE",
+        "id": 0
+      }
+    ]
+  }
+}
